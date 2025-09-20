@@ -51,29 +51,29 @@ pub fn build(b: *std.Build) void {
 
     // 美化测试 - 关键：传入 target 和 optimize
     const test_step = b.step("test", "Run tests");
-    test_step.dependOn(pretty_test.addPrettyTest(b, .{
-        .test_files = &.{
-            .{ .path = b.path("src/root.zig") },
-            .{ .path = b.path("src/main.zig") },
-            .{ .path = b.path("src/test_pass.zig") },
-        },
-        .target = target, // 必须传入！
-        .optimize = optimize, // 必须传入！
-        .verbose = true,
-        .show_output = true,
-    }));
+    //test_step.dependOn(pretty_test.addPrettyTest(b, .{
+    //    .test_files = &.{
+    //        .{ .path = b.path("src/root.zig") },
+    //        .{ .path = b.path("src/main.zig") },
+    //        .{ .path = b.path("src/test_pass.zig") },
+    //    },
+    //    .target = target, // 必须传入！
+    //    .optimize = optimize, // 必须传入！
+    //    .verbose = true,
+    //    .show_output = true,
+    //}));
     test_step.dependOn(&run_mod_tests.step);
     test_step.dependOn(&run_exe_tests.step);
 
     // 如果你想要单独的美化测试步骤
-    const pretty_only = b.step("test-pretty", "Run only pretty tests");
-    pretty_only.dependOn(pretty_test.addPrettyTest(b, .{
-        .test_files = &.{
-            .{ .path = b.path("src/root.zig") },
-            .{ .path = b.path("src/main.zig") },
-        },
-        .target = target,
-        .optimize = optimize,
-        .verbose = true,
-    }));
+    //const pretty_only = b.step("test-pretty", "Run only pretty tests");
+    //pretty_only.dependOn(pretty_test.addPrettyTest(b, .{
+    //    .test_files = &.{
+    //        .{ .path = b.path("src/root.zig") },
+    //        .{ .path = b.path("src/main.zig") },
+    //    },
+    //    .target = target,
+    //    .optimize = optimize,
+    //    .verbose = true,
+    //}));
 }
