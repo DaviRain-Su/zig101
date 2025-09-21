@@ -22,7 +22,24 @@ pub const User = struct {
             std.debug.print("It's over {d}\n", .{SUPER_POWER});
         }
     }
+
+    fn levelUp(self: *User) void {
+        std.debug.print("Leveling up...{*}\n", .{self});
+        self.power += 1;
+        std.debug.print("Level: {s} with power {d}\n", .{ self.name, self.power });
+    }
 };
+
+test "levelUp" {
+    var user = User.init("John Doe", 1000000);
+    std.debug.print("USER ADDRESS:\n{*}\n{*}\n{*}\n", .{ &user, &user.power, &user.name });
+    std.debug.print("user address: {*}\n", .{&user});
+    const user_p = &user;
+    std.debug.print("user address type: {any}\n", .{@TypeOf(user_p)});
+    user.levelUp();
+    std.debug.print("User: {s} with power {d}\n", .{ user.name, user.power });
+    user.diagnose();
+}
 
 // define Empty struct
 pub const Empty = struct {};
@@ -114,3 +131,48 @@ test "匿名结构体" {
     const inner_struct2 = .{ 2023, 8 };
     try std.testing.expect(std.mem.eql(u8, @typeName(@TypeOf(inner_struct)), @typeName(@TypeOf(inner_struct2))));
 }
+
+pub fn contains(comptime T: type, value: T, slice: []const T) bool {
+    for (slice) |item| {
+        if (item == value) return true;
+    }
+    return false;
+}
+
+test "contains" {
+    const array = [_]u8{ 1, 2, 3, 4 };
+    try std.testing.expect(contains(u8, 2, &array));
+    try std.testing.expect(!contains(u8, 5, &array));
+}
+
+pub fn equals(comptime T: type, a: []const T, b: []const T) bool {
+    if (a.len != b.len) return false;
+    for (a, b) |item_a, item_b| {
+        if (item_a != item_b) return false;
+    }
+    return true;
+}
+
+test "equals" {
+    const array1 = [_]u8{ 1, 2, 3, 4 };
+    const array2 = [_]u8{ 1, 2, 3, 4 };
+    try std.testing.expect(equals(u8, &array1, &array2));
+}
+
+pub fn indexOf(comptime T: type, value: T, slice: []const T) ?usize {
+    for (slice, 0..) |item, index| {
+        if (item == value) return index;
+    }
+    return null;
+}
+
+test "indexOf" {
+    const array = [_]u8{ 1, 2, 3, 4 };
+    try std.testing.expect(indexOf(u8, 2, &array) == 1);
+    try std.testing.expect(indexOf(u8, 5, &array) == null);
+}
+
+//  接受一个 T 类型并给我们一个 *T 类型。
+// .* 是相反的操作，应用于一个 *T 类型的值时，它给我们一个 T 类型。即，&获取地址，.*获取值。
+//
+// 一种类似于接口的模式是带标签的联合（tagged unions），不过与真正的接口相比，这种模式相对受限。

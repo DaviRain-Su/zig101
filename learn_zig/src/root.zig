@@ -1,7 +1,7 @@
 //! By convention, root.zig is the root source file when making a library.
 const std = @import("std");
 pub const user = @import("module/user.zig");
-pub const User = user.User;
+pub const enum_usage = @import("module/enum_usage.zig");
 
 pub fn bufferedPrint() !void {
     // Stdout is for the actual output of your application, for example if you
@@ -16,18 +16,15 @@ pub fn bufferedPrint() !void {
     try stdout.flush(); // Don't forget to flush!
 }
 
-pub fn Add(comptime T: type, a: T, b: T) T {
+pub fn add(comptime T: type, a: T, b: T) T {
     return a + b;
 }
 
-test "basic add functionality" {
-    try std.testing.expect(Add(u8, 3, 7) == 10);
-}
-
-test "comptimeAdd" {
-    try std.testing.expect(Add(i32, 3, 7) == 10);
+test "comptime add functionality" {
+    try std.testing.expect(add(i32, 3, 7) == 10);
 }
 
 test {
     _ = @import("module/user.zig");
+    _ = @import("module/enum_usage.zig");
 }
