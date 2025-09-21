@@ -3,8 +3,13 @@ const learn_zig = @import("learn_zig");
 
 pub fn main() !void {
     // Prints to stderr, ignoring potential errors.
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    try learn_zig.bufferedPrint();
+    //std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
+    //try learn_zig.bufferedPrint();
+    //try learn_zig.thread_usage.basicThreadExample();
+    //try learn_zig.thread_usage.multipleThreads(4);
+    //try learn_zig.thread_usage.threadWithResult(10);
+    //try learn_zig.thread_usage.mutexExample(f32, 100, 0.0);
+    try learn_zig.simple_http_server.simpleHttpServer();
 }
 
 test "simple test" {

@@ -2,6 +2,8 @@
 const std = @import("std");
 pub const user = @import("module/user.zig");
 pub const enum_usage = @import("module/enum_usage.zig");
+pub const thread_usage = @import("module/thread_usage.zig");
+pub const simple_http_server = @import("module/simple_http_server.zig");
 
 pub fn bufferedPrint() !void {
     // Stdout is for the actual output of your application, for example if you
@@ -27,4 +29,5 @@ test "comptime add functionality" {
 test {
     _ = @import("module/user.zig");
     _ = @import("module/enum_usage.zig");
+    _ = @import("module/thread_usage.zig");
 }
