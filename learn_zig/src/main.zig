@@ -25,3 +25,12 @@ test "fuzz example" {
     };
     try std.testing.fuzz(Context{}, Context.testOne, .{});
 }
+
+test "example user struct" {
+    const user: learn_zig.User = .{
+        .power = 100,
+        .name = "John Doe",
+    };
+
+    std.debug.print("User: {s} with power {d}\n", .{ user.name, user.power });
+}
