@@ -2,7 +2,6 @@
 const std = @import("std");
 pub const user = @import("module/user.zig");
 pub const User = user.User;
-pub const MAX_POWER = user.MAX_POWER;
 
 pub fn bufferedPrint() !void {
     // Stdout is for the actual output of your application, for example if you
@@ -17,10 +16,22 @@ pub fn bufferedPrint() !void {
     try stdout.flush(); // Don't forget to flush!
 }
 
+pub fn comptimeAdd(comptime T: type, a: T, b: T) T {
+    return a + b;
+}
+
 pub fn add(a: i32, b: i32) i32 {
     return a + b;
 }
 
 test "basic add functionality" {
     try std.testing.expect(add(3, 7) == 10);
+}
+
+test "comptimeAdd" {
+    try std.testing.expect(comptimeAdd(i32, 3, 7) == 10);
+}
+
+test {
+    _ = @import("module/user.zig");
 }
