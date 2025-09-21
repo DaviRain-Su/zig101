@@ -16,20 +16,16 @@ pub fn bufferedPrint() !void {
     try stdout.flush(); // Don't forget to flush!
 }
 
-pub fn comptimeAdd(comptime T: type, a: T, b: T) T {
-    return a + b;
-}
-
-pub fn add(a: i32, b: i32) i32 {
+pub fn Add(comptime T: type, a: T, b: T) T {
     return a + b;
 }
 
 test "basic add functionality" {
-    try std.testing.expect(add(3, 7) == 10);
+    try std.testing.expect(Add(u8, 3, 7) == 10);
 }
 
 test "comptimeAdd" {
-    try std.testing.expect(comptimeAdd(i32, 3, 7) == 10);
+    try std.testing.expect(Add(i32, 3, 7) == 10);
 }
 
 test {
