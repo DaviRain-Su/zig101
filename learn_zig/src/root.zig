@@ -1,6 +1,8 @@
 //! By convention, root.zig is the root source file when making a library.
 const std = @import("std");
-pub const User = @import("module/user.zig").User;
+pub const user = @import("module/user.zig");
+pub const User = user.User;
+pub const MAX_POWER = user.MAX_POWER;
 
 pub fn bufferedPrint() !void {
     // Stdout is for the actual output of your application, for example if you
