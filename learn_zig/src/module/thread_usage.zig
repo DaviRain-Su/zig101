@@ -6,9 +6,8 @@ pub fn basicThreadExample() !void {
 
     // create a new thread
     const thread = try Thread.spawn(.{}, workerFunction, .{"Hello from worker thread!"});
-
     // wait for thread to finish
-    thread.join();
+    defer thread.join();
 
     std.debug.print("Basic main thread example end....\n", .{});
 }
@@ -21,15 +20,11 @@ fn workerFunction(message: []const u8) void {
 
 pub fn multipleThreads(comptime num: usize) !void {
     var threads: [num]Thread = undefined;
+    defer for (threads[0..num]) |handle| handle.join();
 
     // create threads
     for (&threads, 0..) |*t, i| {
         t.* = try Thread.spawn(.{}, worker, .{i});
-    }
-
-    // wait for all threads to finish
-    for (threads) |thread| {
-        thread.join();
     }
 }
 
@@ -47,13 +42,10 @@ const WorkerResult = struct {
 pub fn threadWithResult(comptime num: usize) !void {
     var results: [num]WorkerResult = undefined;
     var threads: [num]Thread = undefined;
+    defer for (threads[0..num]) |handle| handle.join();
 
     for (&threads, 0..) |*t, i| {
         t.* = try Thread.spawn(.{}, computeWork, .{ i, &results[i] });
-    }
-
-    for (threads) |thread| {
-        thread.join();
     }
 
     for (results) |result| {
@@ -103,9 +95,10 @@ fn Counter(comptime T: type) type {
 
 pub fn mutexExample(comptime T: type, comptime num: usize, v: T) !void {
     var counter = Counter(T).init(v);
-    var thread: [num]Thread = undefined;
+    var threads: [num]Thread = undefined;
+    defer for (threads[0..num]) |handle| handle.join();
 
-    for (&thread) |*t| {
+    for (&threads) |*t| {
         t.* = try Thread.spawn(.{}, struct {
             fn run(c: *Counter(T)) void {
                 for (0..num) |_| {
@@ -114,10 +107,5 @@ pub fn mutexExample(comptime T: type, comptime num: usize, v: T) !void {
             }
         }.run, .{&counter});
     }
-
-    for (thread) |t| {
-        t.join();
-    }
-
     std.debug.print("Final value: {any}\n", .{counter.getValue()});
 }

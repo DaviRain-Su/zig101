@@ -8,8 +8,8 @@ pub fn main() !void {
     //try learn_zig.thread_usage.basicThreadExample();
     //try learn_zig.thread_usage.multipleThreads(4);
     //try learn_zig.thread_usage.threadWithResult(10);
-    //try learn_zig.thread_usage.mutexExample(f32, 100, 0.0);
-    try learn_zig.simple_http_server.simpleHttpServer();
+    try learn_zig.thread_usage.mutexExample(f32, 100, 0.0);
+    //try learn_zig.simple_http_server.simpleHttpServer();
 }
 
 test "simple test" {
