@@ -22,6 +22,27 @@ pub fn add(comptime T: type, a: T, b: T) T {
     return a + b;
 }
 
+pub fn addi32(a: i32, b: i32) i32 {
+    //a = b; // error: cannot assign to constant
+    std.debug.print("a = {d}\n", .{a});
+    return a + b;
+}
+
+pub fn addi32Byref(a: *i32, b: i32) i32 {
+    a.* = b;
+    std.debug.print("a = {d}\n", .{a.*});
+    return a.* + b;
+}
+
+test "test addi32Byref" {
+    var a: i32 = 3;
+    try std.testing.expect(addi32Byref(&a, 7) == 14);
+}
+
+test "test addi32" {
+    try std.testing.expect(addi32(3, 7) == 10);
+}
+
 test "comptime add functionality" {
     try std.testing.expect(add(i32, 3, 7) == 10);
 }
