@@ -43,6 +43,8 @@ pub fn main() !void {
     const stdout = &stdout_writer.interface;
     try stdout.print("Hello, {s}!\n", .{"world"});
     try stdout.flush(); // Don't forget to flush!
+    // try learn_zig.readline_number.readline_number();
+    try learn_zig.readline_number.readline_number();
 }
 
 test "simple test" {

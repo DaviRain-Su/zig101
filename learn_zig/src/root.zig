@@ -4,6 +4,7 @@ pub const user = @import("module/user.zig");
 pub const enum_usage = @import("module/enum_usage.zig");
 pub const thread_usage = @import("module/thread_usage.zig");
 pub const simple_http_server = @import("module/simple_http_server.zig");
+pub const readline_number = @import("module/readline_num.zig");
 
 pub fn bufferedPrint() !void {
     // Stdout is for the actual output of your application, for example if you
