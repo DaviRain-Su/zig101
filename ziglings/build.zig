@@ -498,42 +498,38 @@ const ZiglingStep = struct {
         const path = join(b.allocator, &.{ self.work_path, exercise_path }) catch
             @panic("OOM");
 
-        var zig_args = std.ArrayList([]const u8).init(b.allocator);
-        defer zig_args.deinit();
+        var zig_args = try std.ArrayList([]const u8).initCapacity(b.allocator, 100);
+        defer zig_args.deinit(b.allocator);
 
-        zig_args.append(b.graph.zig_exe) catch @panic("OOM");
+        zig_args.append(b.allocator, b.graph.zig_exe) catch @panic("OOM");
 
         const cmd = switch (self.exercise.kind) {
             .exe => "build-exe",
             //.@"test" => "test",
         };
-        zig_args.append(cmd) catch @panic("OOM");
+        zig_args.append(b.allocator, cmd) catch @panic("OOM");
 
         // Enable C support for exercises that use C functions.
         if (self.exercise.link_libc) {
-            zig_args.append("-lc") catch @panic("OOM");
+            zig_args.append(b.allocator, "-lc") catch @panic("OOM");
         }
 
         if (b.reference_trace) |rt| {
-            zig_args.append(b.fmt("-freference-trace={}", .{rt})) catch @panic("OOM");
+            zig_args.append(b.allocator, b.fmt("-freference-trace={}", .{rt})) catch @panic("OOM");
         }
 
-        zig_args.append(b.pathFromRoot(path)) catch @panic("OOM");
+        zig_args.append(b.allocator, b.pathFromRoot(path)) catch @panic("OOM");
 
-        zig_args.append("--cache-dir") catch @panic("OOM");
-        zig_args.append(b.pathFromRoot(b.cache_root.path.?)) catch @panic("OOM");
+        zig_args.append(b.allocator, "--cache-dir") catch @panic("OOM");
+        zig_args.append(b.allocator, b.pathFromRoot(b.cache_root.path.?)) catch @panic("OOM");
 
-        zig_args.append("--listen=-") catch @panic("OOM");
+        zig_args.append(b.allocator, "--listen=-") catch @panic("OOM");
 
         //
         // NOTE: After many changes in zig build system, we need to create the cache path manually.
         // See https://github.com/ziglang/zig/pull/21115
         // Maybe there is a better way (in the future).
-        const exe_dir = try self.step.evalZigProcess(
-            zig_args.items,
-            prog_node,
-            false,
-        );
+        const exe_dir = try self.step.evalZigProcess(zig_args.items, prog_node, false, null, b.allocator);
         const exe_name = switch (self.exercise.kind) {
             .exe => self.exercise.name(),
             //.@"test" => "test",
@@ -601,11 +597,11 @@ pub fn trimLines(allocator: std.mem.Allocator, buf: []const u8) ![]const u8 {
     while (iter.next()) |line| {
         // TODO: trimming CR characters is probably not necessary.
         const data = std.mem.trimRight(u8, line, " \r");
-        try list.appendSlice(data);
-        try list.append('\n');
+        try list.appendSlice(allocator, data);
+        try list.append(allocator, '\n');
     }
 
-    const result = try list.toOwnedSlice(); // TODO: probably not necessary
+    const result = try list.toOwnedSlice(allocator); // TODO: probably not necessary
 
     // Remove the trailing LF character, that is always present in the exercise
     // output.
