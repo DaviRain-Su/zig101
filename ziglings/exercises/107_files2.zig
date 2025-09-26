@@ -1,52 +1,53 @@
 //
-// Prerequisite :
-//    - exercise/106_files.zig, or
-//    - create a file {project_root}/output/zigling.txt
-//      with content `It's zigling time!`(18 bytes total)
+// 先决条件：
+//    - exercise/106_files.zig，或者
+//    - 在 {project_root}/output/ 下创建一个文件 zigling.txt
+//      其内容为 `It's zigling time!`（共 18 字节）
 //
-// Now there's no point in writing to a file if we don't read from it, am I right?
-// Let's write a program to read the content of the file that we just created.
+// 如果我们写入文件却不读取，那还有什么意义？对吧？
+// 让我们写一个程序来读取刚才创建的文件的内容。
 //
-// I am assuming that you've created the appropriate files for this to work.
+// 我假设你已经为此创建了相应的文件。
 //
-// Alright, bud, lean in close. Here's the game plan.
-//    - First, we open the {project_root}/output/ directory
-//    - Secondly, we open file `zigling.txt` in that directory
-//    - Then, we initialize an array of characters with all letter 'A', and print it
-//    - After that, we read the content of the file into the array
-//    - Finally, we print out the content we just read
+// 好的，小伙子，靠近点。计划如下：
+//    - 首先，我们打开 {project_root}/output/ 目录
+//    - 其次，我们在该目录下打开文件 `zigling.txt`
+//    - 然后，我们用字母 'A' 初始化一个字符数组，并打印它
+//    - 接下来，我们将文件的内容读入该数组
+//    - 最后，我们打印出刚读取到的内容
+//
 
 const std = @import("std");
 
 pub fn main() !void {
-    // Get the current working directory
+    // 获取当前工作目录
     const cwd = std.fs.cwd();
 
-    // try to open ./output assuming you did your 106_files exercise
+    // 尝试打开 ./output，假设你已经完成了 106_files 练习
     var output_dir = try cwd.openDir("output", .{});
     defer output_dir.close();
 
-    // try to open the file
+    // 尝试打开文件
     const file = try output_dir.openFile("zigling.txt", .{});
     defer file.close();
 
-    // initialize an array of u8 with all letter 'A'
-    // we need to pick the size of the array, 64 seems like a good number
-    // fix the initialization below
+    // 用全部为字母 'A' 的 u8 数组进行初始化
+    // 我们需要选择数组大小，64 看起来是个不错的数字
+    // 修复下面的初始化
     var content = ['A']*64;
-    // this should print out : `AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`
+    // 这应该打印出：`AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`
     std.debug.print("{s}\n", .{content});
 
-    // okay, seems like a threat of violence is not the answer in this case
-    // can you go here to find a way to read the content?
+    // 好吧，看来用暴力威胁并不是解决办法
+    // 你可以在这里找到读取内容的方法吗？
     // https://ziglang.org/documentation/master/std/#std.fs.File
-    // hint: you might find two answers that are both valid in this case
+    // 提示：在这种情况下你可能会找到两种都有效的答案
     const bytes_read = zig_read_the_file_or_i_will_fight_you(&content);
 
-    // Woah, too screamy. I know you're excited for zigling time but tone it down a bit.
-    // Can you print only what we read from the file?
-    std.debug.print("Successfully Read {d} bytes: {s}\n", .{
+    // 哇，太大声了。我知道你对 zigling 时刻很激动，但收敛一点。
+    // 你能只打印我们从文件中读取的内容吗？
+    std.debug.print("成功读取 {d} 字节：{s}\n", .{
         bytes_read,
-        content, // change this line only
+        content, // 仅修改此行以打印已读取的部分
     });
 }

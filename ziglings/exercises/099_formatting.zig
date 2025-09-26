@@ -1,84 +1,66 @@
 //
-// Terminals have come a long way over the years. Starting with
-// monochrome lines on flickering CRT monitors and continuously
-// improving to today's modern terminal emulators with sharp
-// images, true color, fonts, ligatures, and characters in every
-// known language.
+// 多年来，终端已经走了很长一段路。
+// 从闪烁的 CRT 显示器上的单色文本行，逐渐发展到今天的现代终端模拟器，
+// 支持清晰的图像、真彩色、字体、连字以及所有已知语言的字符。
 //
-// Formatting our results to be appealing and allow quick visual
-// comprehension of the information is what users desire. <3
+// 将结果格式化得美观，并便于用户快速理解信息，正是用户所期望的。 <3
 //
-// C set string formatting standards over the years, and Zig is
-// following suit and growing daily. Due to this growth, there is
-// no official documentation for standard library features such
-// as string formatting.
+// 多年来，C 语言设定了字符串格式化的标准，Zig 也在追随并不断发展。
+// 由于发展迅速，目前还没有关于标准库功能（如字符串格式化）的官方文档。
 //
-// Therefore, the comments for the format() function are the only
-// way to definitively learn how to format strings in Zig:
+// 因此，了解 Zig 中字符串格式化的唯一权威方式，
+// 就是查看 `format()` 函数的注释：
 //
 //     https://github.com/ziglang/zig/blob/master/lib/std/fmt.zig#L33
 //
-// Zig already has a very nice selection of formatting options.
-// These can be used in different ways, but generally to convert
-// numerical values into various text representations. The results
-// can be used for direct output to a terminal or stored for
-// later use or written to a file. The latter is useful when
-// large amounts of data are to be processed by other programs.
+// Zig 已经有了非常丰富的格式化选项。
+// 这些选项可以用在不同的场景里，通常是将数值转换成各种文本表示形式。
+// 输出结果既可以直接显示在终端上，也可以保存以便后续使用或写入文件。
+// 当有大量数据需要被其他程序处理时，这尤其有用。
 //
-// In Ziglings, we are concerned with the output to the console.
-// But since the formatting instructions for files are the same,
-// what you learn applies universally.
+// 在 Ziglings 里，我们只关心输出到控制台。
+// 但由于文件的格式化指令相同，你学到的内容是通用的。
 //
-// Since we write to "debug" output in Ziglings, our answers
-// usually look something like this:
+// 因为我们在 Ziglings 里写到的是 "debug" 输出，
+// 所以答案通常是这样的：
 //
 //      print("Text {placeholder} another text \n", .{foo});
 //
-// In addition to being replaced with foo in this example, the
-// {placeholder} in the string can also have formatting applied.
-// How does that work?
+// 在这个例子中，{placeholder} 会被 foo 替换。
+// 但其实它也可以加上格式化指令。那是怎么做到的呢？
 //
-// This actually happens in several stages. In one stage, escape
-// sequences are evaluated. The one we've seen the most
-// (including the example above) is "\n" which means "line feed".
-// Whenever this statement is found, a new line is started in the
-// output. Escape sequences can also be written one after the
-// other, e.g. "\n\n" will cause two line feeds.
+// 这实际上分几个阶段完成。
+// 其中一个阶段是解析转义序列。我们见过最多的例子就是 "\n"，表示换行。
+// 每当遇到这个指令，输出就会换到新的一行。
+// 转义序列也可以连续写，比如 "\n\n" 会产生两次换行。
 //
-// By the way, the result of these escape sequences is passed
-// directly to the terminal program. Other than translating them
-// into control codes, escape sequences have nothing to do with
-// Zig. Zig knows nothing about "line feeds" or "tabs" or
-// "bells".
+// 顺便提一句，这些转义序列的效果是直接传递给终端程序的。
+// 除了把它们翻译成控制码之外，它们与 Zig 本身没有关系。
+// Zig 并不知道什么是 "换行"、"制表符" 或 "响铃"。
 //
-// The formatting that Zig *does* perform itself is found in the
-// curly brackets: "{placeholder}". Formatting instructions in
-// the placeholder will determine how the corresponding value,
-// e.g. foo, is displayed.
+// Zig *自己* 执行的格式化是在大括号里："{placeholder}"。
+// 其中的格式化指令决定了对应的值（比如 foo）是如何显示的。
 //
-// And this is where it gets exciting, because format() accepts a
-// variety of formatting instructions. It's basically a tiny
-// language of its own. Here's a numeric example:
+// 这就变得很有趣了，因为 `format()` 接受各种各样的格式化指令。
+// 它本身几乎就是一门小语言。下面是一个数值的例子：
 //
 //     print("Catch-0x{x:0>4}.", .{twenty_two});
 //
-// This formatting instruction outputs a hexadecimal number with
-// leading zeros:
+// 这个格式化指令输出一个带前导零的十六进制数：
 //
 //     Catch-0x0016.
 //
-// Or you can center-align a string like so:
+// 你也可以像这样把字符串居中对齐：
 //
 //     print("{s:*^20}\n", .{"Hello!"});
 //
-// Output:
+// 输出结果：
 //
 //     *******Hello!*******
 //
-// Let's try making use of some formatting. We've decided that
-// the one thing missing from our lives is a multiplication table
-// for all numbers from 1-15. We want the table to be nice and
-// neat, with numbers in straight columns like so:
+// 现在让我们试试格式化的应用。
+// 我们决定写一个 1~15 的乘法表。
+// 我们希望它整齐美观，数字能排成直直的列，比如：
 //
 //      X |  1   2   3   4   5  ...
 //     ---+---+---+---+---+---+
@@ -94,47 +76,46 @@
 //
 //      ...
 //
-// Without string formatting, this would be a more challenging
-// assignment because the number of digits in the numbers varies
-// from 1 to 3. But formatting can help us with that.
+// 如果没有字符串格式化，这会很麻烦，
+// 因为数字的位数从 1 到 3 不等。
+// 但有了格式化，这就简单多了。
 //
 const std = @import("std");
 const print = std.debug.print;
 
 pub fn main() !void {
-    // Max number to multiply
+    // 最大乘数
     const size = 15;
 
-    // Print the header:
+    // 打印表头：
     //
-    // We start with a single 'X' for the diagonal.
+    // 先打印一个 'X' 作为对角标识。
     print("\n X |", .{});
 
-    // Header row with all numbers from 1 to size.
+    // 表头行，从 1 到 size。
     for (0..size) |n| {
         print("{d:>3} ", .{n + 1});
     }
     print("\n", .{});
 
-    // Header column rule line.
+    // 打印表头的分隔线。
     var n: u8 = 0;
     while (n <= size) : (n += 1) {
         print("---+", .{});
     }
     print("\n", .{});
 
-    // Now the actual table. (Is there anything more beautiful
-    // than a well-formatted table?)
+    // 接下来是真正的乘法表。
+    // （有没有比一个整齐的表格更美的东西？）
     for (0..size) |a| {
         print("{d:>2} |", .{a + 1});
 
         for (0..size) |b| {
-            // What formatting is needed here to make our columns
-            // nice and straight?
+            // 在这里填上合适的格式化，让列对齐。
             print("{???} ", .{(a + 1) * (b + 1)});
         }
 
-        // After each row we use double line feed:
+        // 每行结束后用两个换行符。
         print("\n\n", .{});
     }
 }

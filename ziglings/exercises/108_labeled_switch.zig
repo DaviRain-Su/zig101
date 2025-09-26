@@ -1,12 +1,12 @@
 //
-// You've heard of while loops in exercises 011,012,013 and 014
-// You've also heard of switch expressions in exercises 030 and 31.
-// You've also seen how labels can be used in exercise 063.
+// 你在练习 011、012、013 和 014 中听说过 while 循环
+// 你在练习 030 和 031 中也听说过 switch 表达式。
+// 你在练习 063 中还见过标签（label）的用法。
 //
-// By combining while loops and switch statements with continue and break statements
-// one can create very concise State Machines.
+// 通过将 while 循环和 switch 语句与 continue 和 break 语句结合，
+// 我们可以创建非常简洁的状态机（State Machine）。
 //
-// One such example would be:
+// 其中一个例子是：
 //
 //      pub fn main() void {
 //          var op: u8 = 1;
@@ -19,15 +19,15 @@
 //              }
 //              break;
 //          }
-//          std.debug.print("This statement cannot be reached\n", .{});
+//          std.debug.print("这一行语句永远无法被执行\n", .{});
 //      }
 //
-// By combining all we've learned so far, we can now proceed with a labeled switch.
+// 通过结合我们到目前为止学到的所有内容，我们现在可以继续学习带标签的 switch。
 //
-// A labeled switch is some extra syntactic sugar, which comes with all sorts of
-// candy (performance benefits). Don't believe me? Directly to source https://github.com/ziglang/zig/pull/21367
+// 带标签的 switch 是一些额外的语法糖，它还能带来各种好处（性能提升）。
+// 不相信？直接看源码：https://github.com/ziglang/zig/pull/21367
 //
-// Here is the previous excerpt implemented as a labeled switch instead:
+// 下面是前面片段用带标签的 switch 实现的方式：
 //
 //      pub fn main() void {
 //          foo: switch (@as(u8, 1)) {
@@ -36,22 +36,21 @@
 //              3 => return,
 //              else => {},
 //          }
-//          std.debug.print("This statement cannot be reached\n", .{});
+//          std.debug.print("这一行语句永远无法被执行\n", .{});
 //      }
 //
-// The flow of execution on this second case is:
-//  1. The switch starts with value '1';
-//  2. The switch evaluates to case '1' which in turn uses the continue statement
-//     to re-evaluate the labeled switch again, now providing the value '2';
-//  3. In the case '2' we repeat the same pattern as case '1'
-//     but instead the value to be evaluated is now '3';
-//  4. Finally we get to case '3', where we return from the function as a whole,
-//     so the debug statement is never executed.
-//  5. In this example, since the input does not have clear, exhaustive patterns and
-//     can essentially be any 'u8' integer, we need to handle all cases not explicitly
-//     covered by using the 'else => {}' branch as the default case.
+// 这个第二种写法的执行流程是：
+//  1. switch 从值 `1` 开始；
+//  2. switch 匹配到 case `1`，它使用 continue 语句重新求值带标签的 switch，
+//     现在提供的值是 `2`；
+//  3. 在 case `2` 中，我们重复 case `1` 的模式，
+//     但这次要被求值的值是 `3`；
+//  4. 最后我们到达 case `3`，这里直接从整个函数返回，
+//     所以 debug 语句不会被执行；
+//  5. 在这个例子里，由于输入没有明确的穷尽模式，可以是任意 `u8` 整数，
+//     我们需要用 `else => {}` 分支来处理所有没有覆盖的情况。
 //
-//
+
 const std = @import("std");
 
 const PullRequestState = enum(u8) {
@@ -63,17 +62,17 @@ const PullRequestState = enum(u8) {
 };
 
 pub fn main() void {
-    // Oh no, your pull request keeps being rejected,
-    // how would you fix it?
+    // 哎呀，你的 pull request 一直被拒绝，
+    // 你会怎么修复它？
     pr: switch (PullRequestState.Draft) {
         PullRequestState.Draft => continue :pr PullRequestState.InReview,
         PullRequestState.InReview => continue :pr PullRequestState.Rejected,
         PullRequestState.Approved => continue :pr PullRequestState.Merged,
         PullRequestState.Rejected => {
-            std.debug.print("The pull request has been rejected.\n", .{});
+            std.debug.print("这个 pull request 被拒绝了。\n", .{});
             return;
         },
-        PullRequestState.Merged => break, // Would you know where to break to?
+        PullRequestState.Merged => break, // 你知道这里应该跳出到哪里吗？
     }
-    std.debug.print("The pull request has been merged.\n", .{});
+    std.debug.print("这个 pull request 已经被合并了。\n", .{});
 }

@@ -1,107 +1,107 @@
-// So far in Ziglings, we've seen how for loops can be used to
-// repeat calculations across an array in several ways.
 //
-// For loops are generally great for this kind of task, but
-// sometimes they don't fully utilize the capabilities of the
-// CPU.
+// 到目前为止，在 Ziglings 中，我们已经看到 for 循环是如何以不同方式
+// 在数组上重复执行计算的。
 //
-// Most modern CPUs can execute instructions in which SEVERAL
-// calculations are performed WITHIN registers at the SAME TIME.
-// These are known as "single instruction, multiple data" (SIMD)
-// instructions. SIMD instructions can make code significantly
-// more performant.
+// for 循环通常非常适合这种任务，
+// 但有时它们并不能完全发挥 CPU 的能力。
 //
-// To see why, imagine we have a program in which we take the
-// square root of four (changing) f32 floats.
+// 大多数现代 CPU 可以执行一些指令，
+// 在寄存器内部同时进行**多个**计算。
+// 这类指令被称为 "单指令，多数据"（SIMD）。
+// SIMD 指令能让代码的性能显著提高。
 //
-// A simple compiler would take the program and produce machine code
-// which calculates each square root sequentially. Most registers on
-// modern CPUs have 64 bits, so we could imagine that each float moves
-// into a 64-bit register, and the following happens four times:
+// 举个例子，假设我们有一个程序，
+// 需要对四个（变化的）f32 浮点数开平方。
 //
-//            32 bits   32 bits
+// 一个简单的编译器会将这个程序编译为机器码，
+// 依次对每一个浮点数计算平方根。
+// 大多数现代 CPU 的寄存器是 64 位的，
+// 可以想象每个浮点数被移动到一个 64 位寄存器中，
+// 然后重复四次：
+//
+//            32 位    32 位
 //          +-------------------+
-// register |    0    |    x    |
+// 寄存器    |    0    |    x    |
 //          +-------------------+
 //
 //                    |
-//           [SQRT instruction]
+//             [SQRT 指令]
 //                    V
 //
 //          +-------------------+
 //          |    0    | sqrt(x) |
 //          +-------------------+
 //
-// Notice that half of the register contains blank data to which
-// nothing happened. What a waste! What if we were able to use
-// that space instead? This is the idea at the core of SIMD.
+// 注意到寄存器的一半空间其实是空白的，什么也没发生。
+// 多么浪费啊！如果我们能把这些空间用起来呢？
+// 这正是 SIMD 的核心思想。
 //
-// Most modern CPUs contain specialized registers with at least 128 bits
-// for performing SIMD instructions. On a machine with 128-bit SIMD
-// registers, a smart compiler would probably NOT issue four sqrt
-// instructions as above, but instead pack the floats into a single
-// 128-bit register, then execute a single "packed" sqrt
-// instruction to do ALL the square root calculations at once.
+// 大多数现代 CPU 都包含至少 128 位的专用 SIMD 寄存器，
+// 用来执行 SIMD 指令。
+// 在一台拥有 128 位 SIMD 寄存器的机器上，
+// 一个聪明的编译器可能**不会**像上面那样执行四次 sqrt，
+// 而是将四个浮点数打包进一个 128 位寄存器，
+// 然后执行一次 "打包的" sqrt 指令，
+// 一次性完成所有的平方根计算。
 //
-// For example:
+// 例如：
 //
 //
-//             32 bits   32 bits   32 bits   32 bits
+//             32 位   32 位   32 位   32 位
 //           +---------------------------------------+
-// register  |   4.0   |   9.0   |  25.0   |  49.0   |
+// 寄存器     |   4.0   |   9.0   |  25.0   |  49.0   |
 //           +---------------------------------------+
 //
 //                              |
-//                  [SIMD SQRT instruction]
+//                  [SIMD SQRT 指令]
 //                              V
 //
 //           +---------------------------------------+
-// register  |   2.0   |   3.0   |   5.0   |   7.0   |
+// 寄存器     |   2.0   |   3.0   |   5.0   |   7.0   |
 //           +---------------------------------------+
 //
-// Pretty cool, right?
+// 酷吧？
 //
-// Code with SIMD instructions is usually more performant than code
-// without SIMD instructions. Zig cares a lot about performance,
-// so it has built-in support for SIMD! It has a data structure that
-// directly supports SIMD instructions:
+// 使用 SIMD 指令的代码通常比不用 SIMD 的代码性能更好。
+// Zig 非常重视性能，所以它内置了对 SIMD 的支持！
+// 它有一种数据结构可以直接支持 SIMD 指令：
 //
 //                        +-----------+
-//                        |  Vectors  |
+//                        |  向量     |
 //                        +-----------+
 //
-// Operations performed on vectors in Zig will be done in parallel using
-// SIMD instructions, whenever possible.
+// 在 Zig 中，对向量执行的操作在可能的情况下都会使用 SIMD 指令并行完成。
 //
-// Defining vectors in Zig is straightforwards. No library import is needed.
+// 在 Zig 中定义向量非常简单，不需要导入任何库。
 const v1 = @Vector(3, i32){ 1, 10, 100 };
 const v2 = @Vector(3, f32){ 2.0, 3.0, 5.0 };
 
-// Vectors support the same builtin operators as their underlying base types.
+// 向量支持与其底层基本类型相同的运算符。
 const v3 = v1 + v1; // {   2,  20,  200};
 const v4 = v2 * v2; // { 4.0, 9.0, 25.0};
 
-// Intrinsics that apply to base types usually extend to vectors.
+// 通常适用于基本类型的内建函数也能扩展到向量。
 const v5: @Vector(3, f32) = @floatFromInt(v3); // { 2.0,  20.0,  200.0}
 const v6 = v4 - v5; // { 2.0, -11.0, -175.0}
 const v7 = @abs(v6); // { 2.0,  11.0,  175.0}
 
-// We can make constant vectors, and reduce vectors.
+// 我们可以创建常量向量，并对向量进行归约操作。
 const v8: @Vector(4, u8) = @splat(2); // { 2, 2, 2, 2}
 const v8_sum = @reduce(.Add, v8); // 8
 const v8_min = @reduce(.Min, v8); // 2
 
-// Fixed-length arrays can be automatically assigned to vectors (and vice-versa).
+// 定长数组可以自动赋值给向量（反之亦然）。
 const single_digit_primes = [4]i8{ 2, 3, 5, 7 };
 const prime_vector: @Vector(4, i8) = single_digit_primes;
 
-// Now let's use vectors to simplify and optimize some code!
+// 现在让我们用向量来简化并优化一些代码！
 //
-// Ewa is writing a program in which they frequently want to compare
-// two lists of four f32s. Ewa expects the lists to be similar, and
-// wants to determine the largest pairwise difference between the lists.
+// Ewa 正在写一个程序，
+// 需要频繁比较两个包含四个 f32 的列表。
+// Ewa 预期这些列表会比较接近，
+// 她想要确定两个列表之间最大的逐项差值。
 //
-// Ewa wrote the following function to figure this out.
+// Ewa 写了以下函数来实现这个功能。
 
 fn calcMaxPairwiseDiffOld(list1: [4]f32, list2: [4]f32) f32 {
     var max_diff: f32 = 0;
@@ -114,25 +114,26 @@ fn calcMaxPairwiseDiffOld(list1: [4]f32, list2: [4]f32) f32 {
     return max_diff;
 }
 
-// Ewa heard about vectors in Zig, and started writing a new vector
-// version of the function, but has got stuck!
+// Ewa 听说了 Zig 中的向量，
+// 她开始写一个新的向量版本的函数，
+// 但是被卡住了！
 //
-// Help Ewa finish the vector version! The examples above should help.
+// 帮助 Ewa 完成这个向量版本！
+// 上面的例子应该能帮上忙。
 
 const Vec4 = @Vector(4, f32);
 fn calcMaxPairwiseDiffNew(a: Vec4, b: Vec4) f32 {
-    const abs_diff_vec = ???;
-    const max_diff = @reduce(???, abs_diff_vec);
+    const abs_diff_vec = @abs(a - b);
+    const max_diff = @reduce(.Max, abs_diff_vec);
     return max_diff;
 }
 
-// Quite the simplification! We could even write the function in one line
-// and it would still be readable.
+// 相当简化！我们甚至可以用一行来写这个函数，
+// 而且仍然是可读的。
 //
-// Since the entire function is now expressed in terms of vector operations,
-// the Zig compiler will easily be able to compile it down to machine code
-// which utilizes the all-powerful SIMD instructions and does a lot of the
-// computation in parallel.
+// 由于整个函数现在完全由向量操作组成，
+// Zig 编译器就能轻松把它编译为利用 SIMD 指令的机器码，
+// 在并行中完成大量计算。
 
 const std = @import("std");
 const print = std.debug.print;
@@ -142,6 +143,6 @@ pub fn main() void {
     const l2 = [4]f32{ 3.154, 2.707, 0.591, 0.993 };
     const mpd_old = calcMaxPairwiseDiffOld(l1, l2);
     const mpd_new = calcMaxPairwiseDiffNew(l1, l2);
-    print("Max difference (old fn): {d: >5.3}\n", .{mpd_old});
-    print("Max difference (new fn): {d: >5.3}\n", .{mpd_new});
+    print("最大差值（旧函数）：{d: >5.3}\n", .{mpd_old});
+    print("最大差值（新函数）：{d: >5.3}\n", .{mpd_new});
 }

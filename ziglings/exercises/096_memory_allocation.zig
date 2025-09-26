@@ -1,21 +1,17 @@
 //
-// In most of the examples so far, the inputs are known at compile
-// time, thus the amount of memory used by the program is fixed.
-// However, if responding to input whose size is not known at compile
-// time, such as:
-//  - user input via command-line arguments
-//  - inputs from another program
+// 在目前的大多数示例中，输入在编译时已知，因此程序所使用的内存量是固定的。
+// 然而，如果要响应在编译时未知大小的输入，比如：
+//  - 来自命令行参数的用户输入
+//  - 来自其他程序的输入
 //
-// You'll need to request memory for your program to be allocated by
-// your operating system at runtime.
+// 那么你需要向操作系统在运行时申请内存。
 //
-// Zig provides several different allocators. In the Zig
-// documentation, it recommends the Arena allocator for simple
-// programs which allocate once and then exit:
+// Zig 提供了多种分配器。在 Zig 文档中，推荐在简单的程序里使用 Arena 分配器，
+// 因为它们只分配一次然后退出：
 //
 //     const std = @import("std");
 //
-//     // memory allocation can fail, so the return type is !void
+//     // 内存分配可能失败，所以返回类型是 !void
 //     pub fn main() !void {
 //
 //         var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -30,13 +26,11 @@
 //         std.debug.print("slice_ptr={*}\n", .{slice_ptr});
 //     }
 
-// Instead of a simple integer or a slice with a constant size,
-// this program requires allocating a slice that is the same size
-// as an input array.
+// 与其分配一个简单整数或固定大小的切片，
+// 这个程序需要分配一个和输入数组大小相同的切片。
 
-// Given a series of numbers, take the running average. In other
-// words, each item N should contain the average of the last N
-// elements.
+// 给定一组数字，计算它的“运行平均值”。
+// 换句话说，每个第 N 个元素应包含最近 N 个元素的平均值。
 
 const std = @import("std");
 
@@ -51,20 +45,20 @@ fn runningAverage(arr: []const f64, avg: []f64) void {
 }
 
 pub fn main() !void {
-    // pretend this was defined by reading in user input
+    // 假装这是用户输入得到的
     const arr: []const f64 = &[_]f64{ 0.3, 0.2, 0.1, 0.1, 0.4 };
 
-    // initialize the allocator
+    // 初始化分配器
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
 
-    // free the memory on exit
+    // 程序退出时释放内存
     defer arena.deinit();
 
-    // initialize the allocator
+    // 获取分配器
     const allocator = arena.allocator();
 
-    // allocate memory for this array
-    const avg: []f64 = ???;
+    // 为这个数组分配内存
+    const avg: []f64 = try allocator.alloc(f64, arr.len);
 
     runningAverage(arr, avg);
     std.debug.print("Running Average: ", .{});
@@ -74,5 +68,5 @@ pub fn main() !void {
     std.debug.print("\n", .{});
 }
 
-// For more details on memory allocation and the different types of
-// memory allocators, see https://www.youtube.com/watch?v=vHWiDx_l4V0
+// 想了解更多关于内存分配和不同类型分配器的细节，
+// 可以参考 https://www.youtube.com/watch?v=vHWiDx_l4V0

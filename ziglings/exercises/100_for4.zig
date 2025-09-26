@@ -1,36 +1,29 @@
 //
-// We've seen that the 'for' loop can let us perform some action
-// for every item in an array or slice.
+// 我们已经看到 `for` 循环可以对数组或切片中的每个元素执行某些操作。
 //
-// More recently, we discovered that it supports ranges to
-// iterate over number sequences.
+// 最近，我们发现它也支持范围（range），可以用来遍历数值序列。
 //
-// This is part of a more general capability of the `for` loop:
-// looping over one or more "objects" where an object is an
-// array, slice, or range.
+// 这其实是 `for` 循环更通用的能力的一部分：
+// 它可以遍历一个或多个“对象”，而对象可以是数组、切片或范围。
 //
-// In fact, we *did* use multiple objects way back in Exercise
-// 016 where we iterated over an array and also a numeric index.
-// It didn't always work exactly this way, so the exercise had to
-// be retroactively modified a little bit.
+// 事实上，我们*确实*在练习 016 里用过多个对象，
+// 当时我们同时遍历了一个数组和一个数字索引。
+// 其实当时语法还没这么用，所以那个练习后来稍微改过一点。
 //
 //     for (bits, 0..) |bit, i| { ... }
 //
-// The general form of a 'for' loop with two lists is:
+// 使用两个列表的 `for` 循环的一般形式是：
 //
 //     for (list_a, list_b) |a, b| {
-//         // Here we have the first item from list_a and list_b,
-//         // then the second item from each, then the third and
-//         // so forth...
+//         // 这里我们会同时拿到 list_a 的第一个元素和 list_b 的第一个元素
+//         // 然后是第二个元素、第三个元素……依次类推。
 //     }
 //
-// What's really beautiful about this is that we don't have to
-// keep track of an index or advancing a memory pointer for
-// *either* of these lists. That error-prone stuff is all taken
-// care of for us by the compiler.
+// 最美妙的地方在于：我们完全不用自己维护索引或手动移动内存指针。
+// 这些容易出错的事都由编译器帮我们搞定了。
 //
-// Below, we have a program that is supposed to compare two
-// arrays. Please make it work!
+// 下面有一个程序，它应该比较两个数组。
+// 请把它修好！
 //
 const std = @import("std");
 const print = std.debug.print;
@@ -41,22 +34,22 @@ pub fn main() void {
 
     for (hex_nums, ???) |hn, ???| {
         if (hn != dn) {
-            print("Uh oh! Found a mismatch: {d} vs {d}\n", .{ hn, dn });
+            print("糟糕！发现不匹配：{d} vs {d}\n", .{ hn, dn });
             return;
         }
     }
 
-    print("Arrays match!\n", .{});
+    print("数组匹配！\n", .{});
 }
 //
-// You are perhaps wondering what happens if one of the two lists
-// is longer than the other? Try it!
+// 你可能会想：如果两个列表的长度不同，会发生什么？
+// 试试看！
 //
-// By the way, congratulations for making it to Exercise 100!
+// 顺便说一句，恭喜你做到第 100 个练习啦！
 //
 //    +-------------+
-//    | Celebration |
-//    | Area  * * * |
+//    | 庆祝区 Celebration |
+//    |  * * * * *  |
 //    +-------------+
 //
-// Please keep your celebrating within the area provided.
+// 请把庆祝活动控制在指定区域内哦。

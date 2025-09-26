@@ -1,99 +1,79 @@
 //
-// A big advantage of Zig is the integration of its own test system.
-// This allows the philosophy of Test Driven Development (TDD) to be
-// implemented perfectly. Zig even goes one step further than other
-// languages, the tests can be included directly in the source file.
+// Zig 的一个巨大优势是集成了自带的测试系统。
+// 这让测试驱动开发（TDD）的理念可以被完美实现。
+// Zig 甚至比其他语言更进一步：测试可以直接写在源文件里。
 //
-// This has several advantages. On the one hand it is much clearer to
-// have everything in one file, both the source code and the associated
-// test code. On the other hand, it is much easier for third parties
-// to understand what exactly a function is supposed to do if they can
-// simply look at the test inside the source and compare both.
+// 这有几个好处：
+// 一方面，源代码和对应的测试代码都在同一个文件里，会更加清晰。
+// 另一方面，第三方要理解某个函数应该做什么时，可以直接查看源代码里的测试并对照。
 //
-// Especially if you want to understand how e.g. the standard library
-// of Zig works, this approach is very helpful. Furthermore it is very
-// practical, if you want to report a bug to the Zig community, to
-// illustrate it with a small example including a test.
+// 尤其是当你想理解 Zig 的标准库是如何工作的，这种方式非常有帮助。
+// 此外，当你要给 Zig 社区报告一个 bug 时，也很方便，
+// 可以附上一个带有测试的小例子来说明问题。
 //
-// Therefore, in this exercise we will deal with the basics of testing
-// in Zig. Basically, tests work as follows: you pass certain parameters
-// to a function, for which you get a return - the result. This is then
-// compared with the EXPECTED value. If both values match, the test is
-// passed, otherwise an error message is displayed.
+// 因此，这个练习我们要学习 Zig 测试的基础。
+// 基本上，测试的工作方式是：
+// 你给函数传入一些参数，得到一个返回值（结果）。
+// 然后把结果和“期望值”比较。
+// 如果两者一致，测试通过；否则就会显示错误信息。
 //
 //          testing.expect(foo(param1, param2) == expected);
 //
-// Also other comparisons are possible, deviations or also errors can
-// be provoked, which must lead to an appropriate behavior of the
-// function, so that the test is passed.
+// 当然也可以进行其他比较，甚至可以刻意制造错误，
+// 只要函数的行为符合预期，测试也会通过。
 //
-// Tests can be run via Zig build system or applied directly to
-// individual modules using "zig test xyz.zig".
+// 测试既可以通过 Zig 的构建系统运行，
+// 也可以直接对单个模块运行： `zig test xyz.zig`。
 //
-// Both can be used script-driven to execute tests automatically, e.g.
-// after checking into a Git repository. Something we also make extensive
-// use of here at Ziglings.
+// 两者都可以用脚本驱动，在比如提交代码到 Git 仓库后自动执行测试。
+// Ziglings 本身也大量使用了这种方式。
 //
 const std = @import("std");
 const testing = std.testing;
 
-// This is a simple function
-// that builds a sum from the
-// passed parameters and returns.
+// 这是一个简单的函数，
+// 它将传入的两个参数相加并返回。
 fn add(a: f16, b: f16) f16 {
     return a + b;
 }
 
-// The associated test.
-// It always starts with the keyword "test",
-// followed by a description of the tasks
-// of the test. This is followed by the
-// test cases in curly brackets.
+// 对应的测试。
+// 它总是以关键字 "test" 开始，
+// 后面跟一个描述测试任务的字符串。
+// 花括号里写测试用例。
 test "add" {
 
-    // The first test checks if the sum
-    // of '41' and '1' gives '42', which
-    // is correct.
+    // 第一个测试检查 41 + 1 是否等于 42，
+    // 这是正确的。
     try testing.expect(add(41, 1) == 42);
 
-    // Another way to perform this test
-    // is as follows:
+    // 另一种写法：
     try testing.expectEqual(42, add(41, 1));
 
-    // This time a test with the addition
-    // of a negative number:
+    // 这次是测试一个负数相加：
     try testing.expect(add(5, -4) == 1);
 
-    // And a floating point operation:
+    // 再来一个浮点数运算：
     try testing.expect(add(1.5, 1.5) == 3);
 }
 
-// Another simple function
-// that returns the result
-// of subtracting the two
-// parameters.
+// 另一个简单函数，
+// 返回两个参数相减的结果。
 fn sub(a: f16, b: f16) f16 {
     return a - b;
 }
 
-// The corresponding test
-// is not much different
-// from the previous one.
-// Except that it contains
-// an error that you need
-// to correct.
+// 对应的测试和前面的没什么不同。
+// 只是里面包含了一个错误，需要你来修复。
 test "sub" {
     try testing.expect(sub(10, 5) == 6);
 
     try testing.expect(sub(3, 1.5) == 1.5);
 }
 
-// This function divides the
-// numerator by the denominator.
-// Here it is important that the
-// denominator must not be zero.
-// This is checked and if it
-// occurs an error is returned.
+// 这个函数执行除法：分子 ÷ 分母。
+// 这里要注意：分母不能为 0。
+// 如果分母是 0，就返回一个错误。
 fn divide(a: f16, b: f16) !f16 {
     if (b == 0) return error.DivisionByZero;
     return a / b;
@@ -105,8 +85,7 @@ test "divide" {
     try testing.expect(divide(10, 2) catch unreachable == 5);
     try testing.expect(divide(1, 3) catch unreachable == 0.3333333333333333);
 
-    // Now we test if the function returns an error
-    // if we pass a zero as denominator.
-    // But which error needs to be tested?
+    // 现在我们测试当分母为 0 时，函数是否返回错误。
+    // 但是我们要检查的是哪个错误呢？
     try testing.expectError(error.???, divide(15, 0));
 }

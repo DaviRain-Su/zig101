@@ -1,31 +1,26 @@
 //
-// Remember our ant and bee simulator constructed with unions
-// back in exercises 55 and 56? There, we demonstrated that
-// unions allow us to treat different data types in a uniform
-// manner.
+// 还记得我们在练习 55 和 56 中用 union 构建的蚂蚁和蜜蜂模拟器吗？
+// 在那里我们演示了 union 允许我们以统一的方式处理不同的数据类型。
 //
-// One neat feature was using tagged unions to create a single
-// function to print a status for ants *or* bees by switching:
+// 一个很巧妙的功能是使用带标签的 union，通过 switch 创建一个
+// 能同时打印蚂蚁 *或* 蜜蜂状态的函数：
 //
 //   switch (insect) {
-//      .still_alive => ...      // (print ant stuff)
-//      .flowers_visited => ...  // (print bee stuff)
+//      .still_alive => ...      // （打印蚂蚁信息）
+//      .flowers_visited => ...  // （打印蜜蜂信息）
 //   }
 //
-// Well, that simulation was running just fine until a new insect
-// arrived in the virtual garden, a grasshopper!
+// 不过这个模拟器运行得好好的，直到一个新昆虫——蚱蜢，来到虚拟花园！
 //
-// Doctor Zoraptera started to add grasshopper code to the
-// program, but then she backed away from her keyboard with an
-// angry hissing sound. She had realized that having code for
-// each insect in one place and code to print each insect in
-// another place was going to become unpleasant to maintain when
-// the simulation expanded to hundreds of different insects.
+// Zoraptera 博士开始在程序里加入蚱蜢的代码，但随后她从键盘前退开，
+// 发出愤怒的嘶嘶声。她意识到：如果每种昆虫的逻辑在一个地方，
+// 而打印函数却在另一个地方，那么当模拟扩展到数百种不同昆虫时，
+// 维护起来会非常麻烦。
 //
-// Thankfully, Zig has another comptime feature we can use
-// to get out of this dilemma called the 'inline else'.
+// 幸运的是，Zig 有另一个编译期功能可以帮助我们摆脱这个困境，
+// 叫做 `inline else`。
 //
-// We can replace this redundant code:
+// 我们可以把这种重复代码：
 //
 //   switch (thing) {
 //       .a => |a| special(a),
@@ -36,20 +31,18 @@
 //       ...
 //   }
 //
-// With:
+// 替换成：
 //
 //   switch (thing) {
 //       .a => |a| special(a),
 //       inline else => |t| normal(t),
 //   }
 //
-// We can have special handling of some cases and then Zig
-// handles the rest of the matches for us.
+// 这样我们就可以对部分情况进行特殊处理，剩下的交给 Zig 自动处理。
 //
-// With this feature, you decide to make an Insect union with a
-// single uniform 'print()' function. All of the insects can
-// then be responsible for printing themselves. And Doctor
-// Zoraptera can calm down and stop gnawing on the furniture.
+// 借助这个功能，你决定创建一个 Insect 联合体，并给它一个统一的 `print()` 方法。
+// 这样每种昆虫都可以自己负责打印自己的状态。
+// Zoraptera 博士终于能冷静下来，不再啃咬家具了。
 //
 const std = @import("std");
 
@@ -69,8 +62,7 @@ const Bee = struct {
     }
 };
 
-// Here's the new grasshopper. Notice how we've also added print
-// methods to each insect.
+// 这是新的蚱蜢。注意我们也为每种昆虫加了 print 方法。
 const Grasshopper = struct {
     distance_hopped: u16,
 
@@ -84,10 +76,9 @@ const Insect = union(enum) {
     bee: Bee,
     grasshopper: Grasshopper,
 
-    // Thanks to 'inline else', we can think of this print() as
-    // being an interface method. Any member of this union with
-    // a print() method can be treated uniformly by outside
-    // code without needing to know any other details. Cool!
+    // 多亏了 `inline else`，我们可以把这个 print() 看作接口方法。
+    // union 中任何带有 print() 方法的成员，都能被外部代码统一调用，
+    // 而无需关心其他细节。很酷吧！
     pub fn print(self: Insect) void {
         switch (self) {
             inline else => |case| return case.print(),
@@ -104,24 +95,20 @@ pub fn main() !void {
 
     std.debug.print("Daily Insect Report:\n", .{});
     for (my_insects) |insect| {
-        // Almost done! We want to print() each insect with a
-        // single method call here.
+        // 差不多完成了！我们想要通过一个统一的方法调用来打印每只昆虫。
         ???
     }
 }
 
-// Our print() method in the Insect union above demonstrates
-// something very similar to the object-oriented concept of an
-// abstract data type. That is, the Insect type doesn't contain
-// the underlying data, and the print() function doesn't
-// actually do the printing.
+// 我们在 Insect 联合体里的 print() 方法，演示了一个非常类似于
+// 面向对象语言里的抽象数据类型的概念。
+// 也就是说，Insect 类型本身并不包含底层数据，print() 函数
+// 实际上也不直接执行打印。
 //
-// The point of an interface is to support generic programming:
-// the ability to treat different things as if they were the
-// same to cut down on clutter and conceptual complexity.
+// 接口的意义在于支持泛型编程：
+// 可以把不同的东西当作相同的来处理，从而减少冗余和复杂度。
 //
-// The Daily Insect Report doesn't need to worry about *which*
-// insects are in the report - they all print the same way via
-// the interface!
+// 《每日昆虫报告》不需要担心报告里有哪些昆虫——它们都能通过
+// 统一接口来打印自己！
 //
-// Doctor Zoraptera loves it.
+// Zoraptera 博士非常满意。

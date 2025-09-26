@@ -1,72 +1,55 @@
 //
-// Now that we are familiar with the principles of multi-threading,
-// let's boldly venture into a practical example from mathematics.
-// We will determine the circle number PI with sufficient accuracy.
+// 现在我们已经熟悉了多线程的基本原理，
+// 让我们大胆尝试一个来自数学的实际例子：
+// 计算圆周率 PI，并且要有足够的精度。
 //
-// There are different methods for this, and some of them are several
-// hundred years old. For us, the dusty procedures are surprisingly well
-// suited to our exercise. Because the mathematicians of the time didn't
-// have fancy computers with which we can calculate something like this
-// in seconds today.
-// Whereby, of course, it depends on the accuracy, i.e. how many digits
-// after the decimal point we are interested in.
-// But these old procedures can still be tackled with paper and pencil,
-// which is why they are easier for us to understand.
-// At least for me. ;-)
+// 计算 PI 有很多方法，其中一些已经有几百年的历史。
+// 对我们来说，这些“古老”的方法反而很适合做练习。
+// 因为当时的数学家没有现代计算机，
+// 只能用纸和笔来处理这些问题。
+// 当然，具体精度取决于我们想要小数点后多少位。
 //
-// So let's take a mental leap back a few years.
-// Around 1672 (if you want to know and read about it in detail, you can
-// do so on Wikipedia, for example), various mathematicians once again
-// discovered a method of approaching the circle number PI.
-// There were the Scottish mathematician Gregory and the German
-// mathematician Leibniz, and even a few hundred years earlier the Indian
-// mathematician Madhava. All of them independently developed the same
-// formula, which was published by Leibniz in 1682 in the journal
-// "Acta Eruditorum".
-// This is why this method has become known as the "Leibniz series",
-// although the other names are also often used today.
-// We will not go into the formula and its derivation in detail, but
-// will deal with the series straight away:
+// 这些方法至今依然容易理解，
+// 至少对我来说是这样。 ;-)
+//
+// 时间回到大约 1672 年（如果你想了解更多，可以查维基百科）。
+// 当时一些数学家重新发现了一种逼近圆周率的方法。
+// 其中有苏格兰数学家 Gregory、德国数学家 Leibniz，
+// 以及更早的印度数学家 Madhava。
+// 他们都独立提出了相同的公式。
+// 这个公式最终在 1682 年由 Leibniz 发表在《学者通报》上。
+// 因此它后来被称为“莱布尼茨级数”，
+// 尽管今天也有人称它为 Gregory 或 Madhava 级数。
+//
+// 我们不深入推导公式，直接看展开式：
 //
 //        4     4     4     4     4
 //  PI = --- - --- + --- - --- + --- ...
 //        1     3     5     7     9
 //
-// As you can clearly see, the series starts with the whole number 4 and
-// approaches the circle number by subtracting and adding smaller and
-// smaller parts of 4. Pretty much everyone has learned PI = 3.14 at school,
-// but very few people remember other digits, and this is rarely necessary
-// in practice. Because either you don't need the precision, or you use a
-// calculator in which the number is stored as a very precise constant.
-// But at some point this constant was calculated and we are doing the same
-// now. The question at this point is, how many partial values do we have
-// to calculate for which accuracy?
+// 可以看到，级数从整数 4 开始，
+// 然后通过加减越来越小的分数逐步逼近 PI。
+// 大多数人只记得 PI ≈ 3.14，
+// 但实际计算机里存储的常数精度非常高。
+// 而这些常数也都是通过类似方法算出来的。
 //
-// The answer is chewing, to get 8 digits after the decimal point we need
-// 1,000,000,000 partial values. And for each additional digit we have to
-// add a zero.
-// Even fast computers - and I mean really fast computers - get a bit warmer
-// on the CPU when it comes to really many digits. But the 8 digits are
-// enough for us for now, because we want to understand the principle and
-// nothing more, right?
+// 那么问题来了：要计算多少项才能得到某个精度？
+// 答案是：想要小数点后 8 位，需要 1,000,000,000 项。
+// 每多一位，就要再多一个零。
+// 即使是很快的计算机，处理这么多项时 CPU 也会发热。
+// 不过 8 位已经足够我们演示原理。
 //
-// As we have already discovered, the Leibniz series is a series with a
-// fixed distance of 2 between the individual partial values. This makes
-// it easy to apply a simple loop to it, because if we start with n = 1
-// (which is not necessarily useful now) we always have to add 2 in each
-// round.
-// But wait! The partial values are alternately added and subtracted.
-// This could also be achieved with one loop, but not very elegantly.
-// It also makes sense to split this between two CPUs, one calculates
-// the positive values and the other the negative values. And so we can
-// simply start two threads and add everything up at the end and we're
-// done.
-// We just have to remember that if only the positive or negative values
-// are calculated, the distances are twice as large, i.e. 4.
+// 莱布尼茨级数的项之间固定相差 2。
+// 如果我们从 n = 1 开始，每次加 2 即可。
+// 但注意：这些项是交替加减的。
+// 用单个循环可以实现，但不够优雅。
+// 更好的方法是让两个 CPU 并行：
+// 一个计算正项，另一个计算负项，最后再相加即可。
+// 需要记住的是：只算正项或负项时，步长变为 4。
 //
-// So that the whole thing has a real learning effect, the first thread
-// call is specified and you have to make the second.
-// But don't worry, it will work out. :-)
+// 为了增加学习效果，第一条线程的调用已经给出，
+// 你需要补充第二条线程的调用。
+// 别担心，很简单的。 :-)
 //
 const std = @import("std");
 
@@ -76,15 +59,15 @@ pub fn main() !void {
     var pi_minus: f64 = 0;
 
     {
-        // First thread to calculate the plus numbers.
+        // 第一个线程：计算正项。
         const handle1 = try std.Thread.spawn(.{}, thread_pi, .{ &pi_plus, 5, count });
         defer handle1.join();
 
-        // Second thread to calculate the minus numbers.
-        ???
-        
+        // 第二个线程：计算负项。
+        const handle2 = try std.Thread.spawn(.{}, thread_pi, .{ &pi_minus, 3, count });
+        defer handle2.join();
     }
-    // Here we add up the results.
+    // 这里将结果相加。
     std.debug.print("PI ≈ {d:.8}\n", .{4 + pi_plus - pi_minus});
 }
 
@@ -94,14 +77,13 @@ fn thread_pi(pi: *f64, begin: u64, end: u64) !void {
         pi.* += 4 / @as(f64, @floatFromInt(n));
     }
 }
-// If you wish, you can increase the number of loop passes, which
-// improves the number of digits.
+// 如果你愿意，可以增加循环次数来提高精度。
 //
-// But be careful:
-// In order for parallel processing to really show its strengths,
-// the compiler must be given the "-O ReleaseFast" flag when it
-// is created. Otherwise the debug functions slow down the speed
-// to such an extent that seconds become minutes during execution.
+// 但要注意：
+// 如果想真正发挥并行计算的优势，
+// 编译时必须加上 `-O ReleaseFast` 参数。
+// 否则调试模式下的函数会拖慢速度，
+// 让“几秒钟”变成“几分钟”。
 //
-// And you should remove the formatting restriction in "print",
-// otherwise you will not be able to see the additional digits.
+// 另外，你还需要去掉 `print` 里的格式化限制，
+// 否则额外的小数位将不会显示。

@@ -1,41 +1,39 @@
 //
-// Often, C functions are used where no equivalent Zig function exists
-// yet. Okay, that's getting less and less. ;-)
+// 通常情况下，C 函数会被用在 Zig 里还没有等效函数的地方。
+// 好吧，这种情况正在变得越来越少了。 ;-)
 //
-// Since the integration of a C function is very simple, as already
-// seen in the last exercise, it naturally offers itself to use the
-// very large variety of C functions for our own programs.
-// As an example:
+// 由于在 Zig 中集成 C 函数非常简单（上一练习已经演示过），
+// 所以我们自然可以利用 C 标准库里大量的函数为我们的程序服务。
+// 举个例子：
 //
-// Let's say we have a given angle of 765.2 degrees. If we want to
-// normalize that, it means that we have to subtract X * 360 degrees
-// to get the correct angle.
-// How could we do that? A good method is to use the modulo function.
-// But if we write "765.2 % 360", it only works with float values
-// that are known at compile time.
-// In Zig, we would use @mod(a, b) instead.
+// 假设我们有一个角度值 765.2 度。
+// 如果想把它归一化（normalize），就需要减去 X * 360 度，
+// 从而得到正确的角度。
+// 我们该怎么做呢？一个好方法就是用取模函数。
+// 但是如果直接写 "765.2 % 360"，它只对编译期已知的浮点数有效。
+// 在 Zig 里，应该使用 @mod(a, b)。
 //
-// Let us now assume that we cannot do this in Zig, but only with
-// a C function from the standard library. In the library "math",
-// there is a function called "fmod"; the "f" stands for floating
-// and means that we can solve modulo for real numbers. With this
-// function, it should be possible to normalize our angle.
-// Let's go.
+// 现在我们假设在 Zig 中做不到，而只能用 C 标准库里的函数。
+// 在 "math" 库里有一个函数叫 "fmod"；其中 "f" 代表浮点数，
+// 表示我们可以对实数做取模运算。
+// 使用这个函数，就可以把角度归一化了。
+// 让我们开始吧。
+//
 
 const std = @import("std");
 
 const c = @cImport({
-    // What do we need here?
-    ???
+    // 我们需要引入什么？
+    @cInclude("math.h");
 });
 
 pub fn main() !void {
     const angle = 765.2;
     const circle = 360;
 
-    // Here we call the C function 'fmod' to get our normalized angle.
+    // 这里我们调用 C 函数 'fmod' 来得到归一化的角度。
     const result = c.fmod(angle, circle);
 
-    // We use formatters for the desired precision and to truncate the decimal places
+    // 我们用格式化器来设置所需的精度，并截断小数位
     std.debug.print("The normalized angle of {d: >3.1} degrees is {d: >3.1} degrees.\n", .{ angle, result });
 }
