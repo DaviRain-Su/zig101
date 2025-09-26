@@ -1,9 +1,9 @@
 //
-// Using `catch` to replace an error with a default value is a bit
-// of a blunt instrument since it doesn't matter what the error is.
+// 使用 `catch` 把错误替换为默认值有点粗暴，
+// 因为它完全不关心到底是哪种错误。
 //
-// Catch lets us capture the error value and perform additional
-// actions with this form:
+// `catch` 还允许我们捕获错误的值，
+// 并基于不同的错误执行额外的操作，写法如下：
 //
 //     canFail() catch |err| {
 //         if (err == FishError.TunaMalfunction) {
@@ -19,8 +19,8 @@ const MyNumberError = error{
 };
 
 pub fn main() void {
-    // The "catch 0" below is a temporary hack to deal with
-    // makeJustRight()'s returned error union (for now).
+    // 下面的 "catch 0" 是个临时方案，
+    // 用来处理 makeJustRight() 返回的错误联合（暂时的）。
     const a: u32 = makeJustRight(44) catch 0;
     const b: u32 = makeJustRight(14) catch 0;
     const c: u32 = makeJustRight(4) catch 0;
@@ -28,13 +28,13 @@ pub fn main() void {
     std.debug.print("a={}, b={}, c={}\n", .{ a, b, c });
 }
 
-// In this silly example we've split the responsibility of making
-// a number just right into four (!) functions:
+// 在这个搞笑的例子里，我们把“让数字刚刚好”的责任
+// 分拆成了四（！）个函数：
 //
-//     makeJustRight()   Calls fixTooBig(), cannot fix any errors.
-//     fixTooBig()       Calls fixTooSmall(), fixes TooBig errors.
-//     fixTooSmall()     Calls detectProblems(), fixes TooSmall errors.
-//     detectProblems()  Returns the number or an error.
+//     makeJustRight()   调用 fixTooBig()，本身不能修复任何错误。
+//     fixTooBig()       调用 fixTooSmall()，修复 TooBig 错误。
+//     fixTooSmall()     调用 detectProblems()，修复 TooSmall 错误。
+//     detectProblems()  返回数字或错误。
 //
 fn makeJustRight(n: u32) MyNumberError!u32 {
     return fixTooBig(n) catch |err| {
@@ -53,12 +53,12 @@ fn fixTooBig(n: u32) MyNumberError!u32 {
 }
 
 fn fixTooSmall(n: u32) MyNumberError!u32 {
-    // Oh dear, this is missing a lot! But don't worry, it's nearly
-    // identical to fixTooBig() above.
+    // 哎呀，这里漏了好多！不过别担心，
+    // 它和上面的 fixTooBig() 基本一样。
     //
-    // If we get a TooSmall error, we should return 10.
-    // If we get any other error, we should return that error.
-    // Otherwise, we return the u32 number.
+    // 如果遇到 TooSmall 错误，我们应该返回 10。
+    // 如果遇到其他错误，我们应该返回该错误。
+    // 否则，我们返回这个 u32 数字。
     return detectProblems(n) ???;
 }
 

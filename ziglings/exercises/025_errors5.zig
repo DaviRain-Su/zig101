@@ -1,9 +1,10 @@
 //
-// Zig has a handy "try" shortcut for this common error handling pattern:
+// Zig 提供了一个很方便的 `try` 简写，
+// 用来处理常见的错误传递模式：
 //
 //     canFail() catch |err| return err;
 //
-// which can be more compactly written as:
+// 这可以更紧凑地写成：
 //
 //     try canFail();
 //
@@ -23,8 +24,8 @@ pub fn main() void {
 }
 
 fn addFive(n: u32) MyNumberError!u32 {
-    // This function needs to return any error which might come back from detect().
-    // Please use a "try" statement rather than a "catch".
+    // 这个函数需要返回 detect() 可能带回的任何错误。
+    // 请使用 `try` 语句，而不是 `catch`。
     //
     const x = detect(n);
 

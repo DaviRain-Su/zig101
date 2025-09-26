@@ -1,7 +1,7 @@
 //
-// Now let's create a function that takes a parameter. Here's an
-// example that takes two parameters. As you can see, parameters
-// are declared just like any other types ("name": "type"):
+// 现在我们来创建一个带参数的函数。
+// 下面是一个带两个参数的例子。可以看到，参数的声明方式和其他类型一样：
+// ("名字": "类型")
 //
 //     fn myFunction(number: u8, is_lucky: bool) void {
 //         ...
@@ -18,13 +18,13 @@ pub fn main() void {
     });
 }
 
-// Please give this function the correct input parameter(s).
-// You'll need to figure out the parameter name and type that we're
-// expecting. The output type has already been specified for you.
+// 请为这个函数补上正确的输入参数。
+// 你需要推断出参数的名字和类型。
+// 输出类型已经为你写好了。
 //
 fn twoToThe(???) u32 {
     return std.math.pow(u32, 2, my_number);
-    // std.math.pow(type, a, b) takes a numeric type and two
-    // numbers of that type (or that can coerce to that type) and
-    // returns "a to the power of b" as that same numeric type.
+    // std.math.pow(type, a, b) 接收一个数值类型和两个
+    // 该类型（或可转换为该类型）的数字，
+    // 返回 "a 的 b 次方"，结果也是该数值类型。
 }
