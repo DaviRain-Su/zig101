@@ -1,23 +1,23 @@
 //
-// As a matter of fact, you can put 'comptime' in front of any
-// expression to force it to be run at compile time.
+// 事实上，你可以在任何表达式前面加上 `comptime`，
+// 来强制它在编译期运行。
 //
-// Execute a function:
+// 执行一个函数：
 //
 //     comptime llama();
 //
-// Get a value:
+// 获取一个值：
 //
 //     bar = comptime baz();
 //
-// Execute a whole block:
+// 执行整个代码块：
 //
 //     comptime {
 //         bar = baz + biff();
 //         llama(bar);
 //     }
 //
-// Get a value from a block:
+// 从代码块中获取一个值：
 //
 //     var llama = comptime bar: {
 //         const baz = biff() + bonk();
@@ -30,36 +30,35 @@ const llama_count = 5;
 const llamas = [llama_count]u32{ 5, 10, 15, 20, 25 };
 
 pub fn main() void {
-    // We meant to fetch the last llama. Please fix this simple
-    // mistake so the assertion no longer fails.
+    // 我们本来是想取最后一只 llama。
+    // 请修复这个简单的错误，让断言不再失败。
     const my_llama = getLlama(5);
 
     print("My llama value is {}.\n", .{my_llama});
 }
 
 fn getLlama(i: usize) u32 {
-    // We've put a guard assert() at the top of this function to
-    // prevent mistakes. The 'comptime' keyword here means that
-    // the mistake will be caught when we compile!
+    // 我们在函数开头放了一个断言 assert() 来防止出错。
+    // 这里使用 `comptime` 关键字，意味着这个错误会在 **编译期**
+    // 被捕获！
     //
-    // Without 'comptime', this would still work, but the
-    // assertion would fail at runtime with a PANIC, and that's
-    // not as nice.
+    // 如果没有 `comptime`，这段代码依然可以运行，
+    // 但断言会在运行时失败并触发 PANIC，
+    // 体验就没那么好了。
     //
-    // Unfortunately, we're going to get an error right now
-    // because the 'i' parameter needs to be guaranteed to be
-    // known at compile time. What can you do with the 'i'
-    // parameter above to make this so?
+    // 不幸的是，现在我们会遇到一个错误，
+    // 因为参数 `i` 必须保证在编译期就已知。
+    // 你能想到怎么修改上面的参数 `i` 来实现吗？
     comptime assert(i < llama_count);
 
     return llamas[i];
 }
 
-// Fun fact: this assert() function is identical to
-// std.debug.assert() from the Zig Standard Library.
+// 趣味知识：这个 assert() 函数和 Zig 标准库里的
+// std.debug.assert() 完全相同。
 fn assert(ok: bool) void {
     if (!ok) unreachable;
 }
 //
-// Bonus fun fact: I accidentally replaced all instances of 'foo'
-// with 'llama' in this exercise and I have no regrets!
+// 额外趣味知识：我不小心把所有的 'foo' 都换成了 'llama'，
+// 但我一点都不后悔！

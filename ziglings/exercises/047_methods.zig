@@ -1,10 +1,10 @@
 //
-// Help! Evil alien creatures have hidden eggs all over the Earth
-// and they're starting to hatch!
+// 救命啊！邪恶的外星生物把蛋藏满了整个地球，
+// 它们正在孵化！
 //
-// Before you jump into battle, you'll need to know three things:
+// 在你投入战斗之前，你需要知道三件事：
 //
-// 1. You can attach functions to structs (and other "type definitions"):
+// 1. 你可以给结构体（和其他“类型定义”）附加函数：
 //
 //     const Foo = struct{
 //         pub fn hello() void {
@@ -12,15 +12,13 @@
 //         }
 //     };
 //
-// 2. A function that is a member of a struct is "namespaced" within
-//    that struct and is called by specifying the "namespace" and then
-//    using the "dot syntax":
+// 2. 属于结构体的函数是在该结构体的“命名空间”中，
+//    调用时需要先写命名空间再用点语法：
 //
 //     Foo.hello();
 //
-// 3. The NEAT feature of these functions is that if their first argument
-//    is an instance of the struct (or a pointer to one) then we can use
-//    the instance as the namespace instead of the type:
+// 3. 很棒的地方在于，如果函数的第一个参数是这个结构体的实例
+//    （或它的指针），那么我们可以用实例来当命名空间来调用它：
 //
 //     const Bar = struct{
 //         pub fn a(self: Bar) void {}
@@ -29,26 +27,26 @@
 //     };
 //
 //    var bar = Bar{};
-//    bar.a() // is equivalent to Bar.a(bar)
-//    bar.b(3) // is equivalent to Bar.b(&bar, 3)
-//    bar.c() // is equivalent to Bar.c(&bar)
+//    bar.a() // 等价于 Bar.a(bar)
+//    bar.b(3) // 等价于 Bar.b(&bar, 3)
+//    bar.c() // 等价于 Bar.c(&bar)
 //
-//    Notice that the name of the parameter doesn't matter. Some use
-//    self, others use a lowercase version of the type name, but feel
-//    free to use whatever is most appropriate.
+//    注意：参数的名字并不重要。
+//    有的用 self，有的用类型名的小写形式，你可以随便取，
+//    只要合适就行。
 //
-// Okay, you're armed.
+// 好了，你武装好了。
 //
-// Now, please zap the alien structs until they're all gone or
-// the Earth will be doomed!
+// 现在，请用热射线把这些外星结构体全消灭掉，
+// 否则地球就要完蛋了！
 //
 const std = @import("std");
 
-// Look at this hideous Alien struct. Know your enemy!
+// 看看这个丑陋的 Alien 结构体。要知己知彼！
 const Alien = struct {
     health: u8,
 
-    // We hate this method:
+    // 我们讨厌这个方法：
     pub fn hatch(strength: u8) Alien {
         return Alien{
             .health = strength * 5,
@@ -56,18 +54,18 @@ const Alien = struct {
     }
 };
 
-// Your trusty weapon. Zap those aliens!
+// 这是你可靠的武器。用它消灭外星人！
 const HeatRay = struct {
     damage: u8,
 
-    // We love this method:
+    // 我们喜欢这个方法：
     pub fn zap(self: HeatRay, alien: *Alien) void {
         alien.health -= if (self.damage >= alien.health) alien.health else self.damage;
     }
 };
 
 pub fn main() void {
-    // Look at all of these aliens of various strengths!
+    // 看看这些不同强度的外星人！
     var aliens = [_]Alien{
         Alien.hatch(2),
         Alien.hatch(1),
@@ -78,19 +76,19 @@ pub fn main() void {
     };
 
     var aliens_alive = aliens.len;
-    const heat_ray = HeatRay{ .damage = 7 }; // We've been given a heat ray weapon.
+    const heat_ray = HeatRay{ .damage = 7 }; // 我们得到了热射线武器。
 
-    // We'll keep checking to see if we've killed all the aliens yet.
+    // 我们要不断检查，看是不是已经把所有外星人都消灭了。
     while (aliens_alive > 0) {
         aliens_alive = 0;
 
-        // Loop through every alien by reference (* makes a pointer capture value)
+        // 用引用遍历每个外星人（* 表示捕获指针）
         for (&aliens) |*alien| {
 
-            // *** Zap the alien with the heat ray here! ***
+            // *** 用热射线攻击外星人！***
             ???.zap(???);
 
-            // If the alien's health is still above 0, it's still alive.
+            // 如果外星人的生命值还大于 0，它就还活着。
             if (alien.health > 0) aliens_alive += 1;
         }
 

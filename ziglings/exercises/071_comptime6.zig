@@ -1,27 +1,25 @@
 //
-// There have been several instances where it would have been
-// nice to use loops in our programs, but we couldn't because the
-// things we were trying to do could only be done at compile
-// time. We ended up having to do those things MANUALLY, like
-// NORMAL people. Bah! We are PROGRAMMERS! The computer should be
-// doing this work.
+// 在我们的程序里，有好几次其实很想用循环，
+// 但没办法，因为我们要做的事情只能在 **编译期** 完成。
+// 最后不得不手动去做，就像普通人一样。呸！
+// 我们可是程序员啊！这活儿应该让电脑来干。
 //
-// An 'inline for' is performed at compile time, allowing you to
-// programmatically loop through a series of items in situations
-// like those mentioned above where a regular runtime 'for' loop
-// wouldn't be allowed:
+// `inline for` 是在编译期执行的循环，
+// 它允许你在某些场景下用循环来处理数据，
+// 比如前面那些普通运行时 `for` 循环不允许的地方：
 //
 //     inline for (.{ u8, u16, u32, u64 }) |T| {
 //         print("{} ", .{@typeInfo(T).Int.bits});
 //     }
 //
-// In the above example, we're looping over a list of types,
-// which are available only at compile time.
+// 在上面的例子中，我们在循环一个类型的列表，
+// 而这些类型是只有在编译期才存在的。
 //
 const print = @import("std").debug.print;
 
-// Remember Narcissus from exercise 065 where we used builtins
-// for reflection? He's back and loving it.
+// 还记得第 065 个练习里的 Narcissus 吗？
+// 当时我们用内建函数做了反射。
+// 现在他又回来了，而且乐在其中。
 const Narcissus = struct {
     me: *Narcissus = undefined,
     myself: *Narcissus = undefined,
@@ -29,14 +27,14 @@ const Narcissus = struct {
 };
 
 pub fn main() void {
-    print("Narcissus has room in his heart for:", .{});
+    print("Narcissus 心中还能容纳：", .{});
 
-    // Last time we examined the Narcissus struct, we had to
-    // manually access each of the three fields. Our 'if'
-    // statement was repeated three times almost verbatim. Yuck!
+    // 上一次我们检查 Narcissus 结构体的时候，
+    // 不得不手动访问三个字段。
+    // if 语句几乎重复了三遍，真恶心！
     //
-    // Please use an 'inline for' to implement the block below
-    // for each field in the slice 'fields'!
+    // 请使用 `inline for` 来实现下面这段逻辑，
+    // 遍历 `fields` 里的每个字段！
 
     const fields = @typeInfo(Narcissus).@"struct".fields;
 
@@ -46,9 +44,8 @@ pub fn main() void {
         }
     }
 
-    // Once you've got that, go back and take a look at exercise
-    // 065 and compare what you've written to the abomination we
-    // had there!
+    // 写完之后，回去看看第 065 个练习，
+    // 比较一下现在的写法和之前那种臃肿的写法！
 
     print(".\n", .{});
 }

@@ -1,19 +1,18 @@
 //
-// Let's revisit the very first error exercise. This time, we're going to
-// look at an error-handling variation of the "if" statement.
+// 我们再回顾一下第一个错误处理练习。
+// 这次，我们要看看 `if` 语句的一种错误处理变体。
 //
 //     if (foo) |value| {
 //
-//         // foo was NOT an error; value is the non-error value of foo
+//         // foo 不是错误；value 是 foo 的非错误值
 //
 //     } else |err| {
 //
-//         // foo WAS an error; err is the error value of foo
+//         // foo 是错误；err 是 foo 的错误值
 //
 //     }
 //
-// We'll take it even further and use a switch statement to handle
-// the error types.
+// 我们还可以更进一步，结合 `switch` 语句来处理错误类型。
 //
 //     if (foo) |value| {
 //         ...
@@ -39,15 +38,16 @@ pub fn main() void {
             std.debug.print("={}. ", .{value});
         } else |err| switch (err) {
             MyNumberError.TooBig => std.debug.print(">4. ", .{}),
-            // Please add a match for TooSmall here and have it print: "<4. "
+            // 请在这里为 TooSmall 添加一个匹配，
+            // 并让它打印："<4. "
         }
     }
 
     std.debug.print("\n", .{});
 }
 
-// This time we'll have numberMaybeFail() return an error union rather
-// than a straight error.
+// 这次 numberMaybeFail() 将返回一个错误联合 (error union)，
+// 而不是单纯的错误。
 fn numberMaybeFail(n: u8) MyNumberError!u8 {
     if (n > 4) return MyNumberError.TooBig;
     if (n < 4) return MyNumberError.TooSmall;

@@ -1,36 +1,32 @@
 //
-// Loop bodies are blocks, which are also expressions. We've seen
-// how they can be used to evaluate and return values. To further
-// expand on this concept, it turns out we can also give names to
-// blocks by applying a 'label':
+// 循环体是代码块，而代码块本身也是表达式。我们已经看到，
+// 它们可以用来计算并返回值。更进一步的是，代码块还可以用
+// 标签（label）来命名：
 //
 //     my_label: { ... }
 //
-// Once you give a block a label, you can use 'break' to exit
-// from that block.
+// 给代码块加上标签后，你就可以用 'break' 跳出该块：
 //
-//     outer_block: {           // outer block
-//         while (true) {       // inner block
+//     outer_block: {           // 外层代码块
+//         while (true) {       // 内层循环
 //             break :outer_block;
 //         }
 //         unreachable;
 //     }
 //
-// As we've just learned, you can return a value using a break
-// statement. Does that mean you can return a value from any
-// labeled block? Yes it does!
+// 正如我们刚刚学到的，你可以通过 break 语句返回一个值。
+// 这是否意味着你可以从任何带标签的代码块返回一个值呢？
+// 答案是：没错！
 //
 //     const foo = make_five: {
 //         const five = 1 + 1 + 1 + 1 + 1;
 //         break :make_five five;
 //     };
 //
-// Labels can also be used with loops. Being able to break out of
-// nested loops at a specific level is one of those things that
-// you won't use every day, but when the time comes, it's
-// incredibly convenient. Being able to return a value from an
-// inner loop is sometimes so handy, it almost feels like cheating
-// (and can help you avoid creating a lot of temporary variables).
+// 标签也可以用在循环上。能够从嵌套循环的特定层级跳出，
+// 这种情况虽然不常见，但一旦需要时，就会非常方便。
+// 有时候从内层循环返回一个值实在太好用了，几乎让人觉得像作弊，
+// （还能帮你避免写一堆临时变量）。
 //
 //     const bar: u8 = two_loop: while (true) {
 //         while (true) {
@@ -38,13 +34,11 @@
 //         }
 //     } else 0;
 //
-// In the above example, the break exits from the outer loop
-// labeled "two_loop" and returns the value 2. The else clause is
-// attached to the outer two_loop and would be evaluated if the
-// loop somehow ended without the break having been called.
+// 在上面的例子中，break 跳出了带标签 "two_loop" 的外层循环
+// 并返回值 2。else 子句附加在外层 two_loop 上，
+// 如果循环在没有执行 break 的情况下结束，就会执行 else 子句。
 //
-// Finally, you can also use block labels with the 'continue'
-// statement:
+// 最后，你也可以在使用 'continue' 时配合块标签：
 //
 //     my_while: while (true) {
 //         continue :my_while;
@@ -52,8 +46,8 @@
 //
 const print = @import("std").debug.print;
 
-// As mentioned before, we'll soon understand why these two
-// numbers don't need explicit types. Hang in there!
+// 前面提到过，我们很快就会明白为什么这两个数字
+// 不需要显式类型。先坚持一下！
 const ingredients = 4;
 const foods = 4;
 
@@ -90,51 +84,47 @@ const menu: [foods]Food = [_]Food{
 };
 
 pub fn main() void {
-    // Welcome to Cafeteria USA! Choose your favorite ingredients
-    // and we'll produce a delicious meal.
+    // 欢迎来到 Cafeteria USA！选择你最喜欢的食材，
+    // 我们会为你做出一份美味的餐点。
     //
-    // Cafeteria Customer Note: Not all ingredient combinations
-    // make a meal. The default meal is macaroni and cheese.
+    // 食客注意：并不是所有的食材组合都能做出一道菜。
+    // 默认的餐点是奶酪通心粉（Mac & Cheese）。
     //
-    // Software Developer Note: Hard-coding the ingredient
-    // numbers (based on array position) will be fine for our
-    // tiny example, but it would be downright criminal in a real
-    // application!
+    // 开发者注意：在我们的微型示例里，硬编码食材编号
+    // （基于数组位置）还凑合，但在真实应用中就相当糟糕了！
     const wanted_ingredients = [_]u8{ 0, 3 }; // Chili, Cheese
 
-    // Look at each Food on the menu...
+    // 查看菜单上的每一道菜...
     const meal = food_loop: for (menu) |food| {
 
-        // Now look at each required ingredient for the Food...
+        // 再查看这道菜所需的每个食材...
         for (food.requires, 0..) |required, required_ingredient| {
 
-            // This ingredient isn't required, so skip it.
+            // 这个食材不是必须的，跳过。
             if (!required) continue;
 
-            // See if the customer wanted this ingredient.
-            // (Remember that want_it will be the index number of
-            // the ingredient based on its position in the
-            // required ingredient list for each food.)
+            // 看看顾客是否想要这个食材。
+            // （注意 want_it 是数组中的索引号，
+            // 对应每道菜食材需求表中的位置。）
             const found = for (wanted_ingredients) |want_it| {
                 if (required_ingredient == want_it) break true;
             } else false;
 
-            // We did not find this required ingredient, so we
-            // can't make this Food. Continue the outer loop.
+            // 如果没找到这个必须的食材，
+            // 这道菜就做不了。继续检查下一道菜。
             if (!found) continue :food_loop;
         }
 
-        // If we get this far, the required ingredients were all
-        // wanted for this Food.
+        // 如果能执行到这里，说明所需的食材顾客都想要。
         //
-        // Please return this Food from the loop.
+        // 请返回这道菜。
         break;
     };
-    // ^ Oops! We forgot to return Mac & Cheese as the default
-    // Food when the requested ingredients aren't found.
+    // ^ 哎呀！我们忘了在找不到匹配时，
+    // 默认返回 Mac & Cheese 了。
 
-    print("Enjoy your {s}!\n", .{meal.name});
+    print("请享用你的 {s}!\n", .{meal.name});
 }
 
-// Challenge: You can also do away with the 'found' variable in
-// the inner loop. See if you can figure out how to do that!
+// 挑战：你也可以去掉内层循环里的 'found' 变量。
+// 看看你能不能找出怎么做！

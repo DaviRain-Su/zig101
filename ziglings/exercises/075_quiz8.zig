@@ -1,11 +1,10 @@
 //
-// Quiz Time!
+// 小测验时间！
 //
-// Let's revisit the Hermit's Map from Quiz 7.
+// 让我们回顾一下 **隐士的地图**（Quiz 7 里的题目）。
 //
-// Oh, don't worry, it's not nearly as big without all the
-// explanatory comments. And we're only going to change one part
-// of it.
+// 哦，别担心，没有了那些长篇大论的解释性注释，代码没那么庞大。
+// 而且这次我们只需要改动其中的一部分。
 //
 const print = @import("std").debug.print;
 
@@ -23,9 +22,9 @@ var d = Place{ .name = "Dogwood Grove" };
 var e = Place{ .name = "East Pond" };
 var f = Place{ .name = "Fox Pond" };
 
-// Remember how we didn't have to declare the numeric type of the
-// place_count because it is only used at compile time? That
-// probably makes a lot more sense now. :-)
+// 还记得我们当时不需要声明 `place_count` 的具体数值类型吗？
+// 因为它只会在编译期使用。
+// 现在是不是更好理解了？ :-)
 const place_count = 6;
 
 const Path = struct {
@@ -34,26 +33,22 @@ const Path = struct {
     dist: u8,
 };
 
-// Okay, so as you may recall, we had to create each Path struct
-// by hand and each one took 5 lines of code to define:
+// 好的，你可能还记得，当时我们必须手动创建每一条 Path，
+// 每一个 Path 都要写整整 5 行代码：
 //
 //    Path{
-//        .from = &a, // from: Archer's Point
-//        .to = &b,   //   to: Bridge
+//        .from = &a, // 起点: Archer's Point
+//        .to = &b,   // 终点: Bridge
 //        .dist = 2,
 //    },
 //
-// Well, armed with the knowledge that we can run code at compile
-// time, we can perhaps shorten this a bit with a simple function
-// instead.
+// 但是现在我们有了编译期执行的知识，
+// 也许可以用一个简单的函数来简化这些代码。
 //
-// Please fill in the body of this function!
-fn makePath(from: *Place, to: *Place, dist: u8) Path {
+// 请补全这个函数体！
+fn makePath(from: *Place, to: *Place, dist: u8) Path {}
 
-}
-
-// Using our new function, these path definitions take up considerably less
-// space in our program now!
+// 使用新函数后，这些路径的定义在程序里占用的空间明显更少了！
 const a_paths = [_]Path{makePath(&a, &b, 2)};
 const b_paths = [_]Path{ makePath(&b, &a, 2), makePath(&b, &d, 1) };
 const c_paths = [_]Path{ makePath(&c, &d, 3), makePath(&c, &e, 2) };
@@ -61,156 +56,17 @@ const d_paths = [_]Path{ makePath(&d, &b, 1), makePath(&d, &c, 3), makePath(&d, 
 const e_paths = [_]Path{ makePath(&e, &c, 2), makePath(&e, &f, 1) };
 const f_paths = [_]Path{makePath(&f, &d, 7)};
 //
-// But is it more readable? That could be argued either way.
+// 但是这样写真的更易读吗？这可是见仁见智的。
 //
-// We've seen that it is possible to parse strings at compile
-// time, so the sky's really the limit on how fancy we could get
-// with this.
+// 我们已经见过可以在编译期解析字符串，
+// 所以理论上能做的事情无限多，花哨程度随你发挥。
 //
-// For example, we could create our own "path language" and
-// create Paths from that. Something like this, perhaps:
+// 举个例子，我们甚至可以自定义一种“路径语言”，
+// 用它来生成 Path，比如这样：
 //
 //    a -> (b[2])
 //    b -> (a[2] d[1])
 //    c -> (d[3] e[2])
 //    ...
 //
-// Feel free to implement something like that as a SUPER BONUS EXERCISE!
-
-const TripItem = union(enum) {
-    place: *const Place,
-    path: *const Path,
-
-    fn printMe(self: TripItem) void {
-        switch (self) {
-            .place => |p| print("{s}", .{p.name}),
-            .path => |p| print("--{}->", .{p.dist}),
-        }
-    }
-};
-
-const NotebookEntry = struct {
-    place: *const Place,
-    coming_from: ?*const Place,
-    via_path: ?*const Path,
-    dist_to_reach: u16,
-};
-
-const HermitsNotebook = struct {
-    entries: [place_count]?NotebookEntry = .{null} ** place_count,
-    next_entry: u8 = 0,
-    end_of_entries: u8 = 0,
-
-    fn getEntry(self: *HermitsNotebook, place: *const Place) ?*NotebookEntry {
-        for (&self.entries, 0..) |*entry, i| {
-            if (i >= self.end_of_entries) break;
-            if (place == entry.*.?.place) return &entry.*.?;
-        }
-        return null;
-    }
-
-    fn checkNote(self: *HermitsNotebook, note: NotebookEntry) void {
-        const existing_entry = self.getEntry(note.place);
-
-        if (existing_entry == null) {
-            self.entries[self.end_of_entries] = note;
-            self.end_of_entries += 1;
-        } else if (note.dist_to_reach < existing_entry.?.dist_to_reach) {
-            existing_entry.?.* = note;
-        }
-    }
-
-    fn hasNextEntry(self: *HermitsNotebook) bool {
-        return self.next_entry < self.end_of_entries;
-    }
-
-    fn getNextEntry(self: *HermitsNotebook) *const NotebookEntry {
-        defer self.next_entry += 1;
-        return &self.entries[self.next_entry].?;
-    }
-
-    fn getTripTo(self: *HermitsNotebook, trip: []?TripItem, dest: *Place) TripError!void {
-        const destination_entry = self.getEntry(dest);
-
-        if (destination_entry == null) {
-            return TripError.Unreachable;
-        }
-
-        var current_entry = destination_entry.?;
-        var i: u8 = 0;
-
-        while (true) : (i += 2) {
-            trip[i] = TripItem{ .place = current_entry.place };
-            if (current_entry.coming_from == null) break;
-            trip[i + 1] = TripItem{ .path = current_entry.via_path.? };
-            const previous_entry = self.getEntry(current_entry.coming_from.?);
-            if (previous_entry == null) return TripError.EatenByAGrue;
-            current_entry = previous_entry.?;
-        }
-    }
-};
-
-pub fn main() void {
-    const start = &a; // Archer's Point
-    const destination = &f; // Fox Pond
-
-    // We could either have this:
-    //
-    //   a.paths = a_paths[0..];
-    //   b.paths = b_paths[0..];
-    //   c.paths = c_paths[0..];
-    //   d.paths = d_paths[0..];
-    //   e.paths = e_paths[0..];
-    //   f.paths = f_paths[0..];
-    //
-    // or this comptime wizardry:
-    //
-    const letters = [_][]const u8{ "a", "b", "c", "d", "e", "f" };
-    inline for (letters) |letter| {
-        @field(@This(), letter).paths = @field(@This(), letter ++ "_paths")[0..];
-    }
-
-    var notebook = HermitsNotebook{};
-    var working_note = NotebookEntry{
-        .place = start,
-        .coming_from = null,
-        .via_path = null,
-        .dist_to_reach = 0,
-    };
-    notebook.checkNote(working_note);
-
-    while (notebook.hasNextEntry()) {
-        const place_entry = notebook.getNextEntry();
-
-        for (place_entry.place.paths) |*path| {
-            working_note = NotebookEntry{
-                .place = path.to,
-                .coming_from = place_entry.place,
-                .via_path = path,
-                .dist_to_reach = place_entry.dist_to_reach + path.dist,
-            };
-            notebook.checkNote(working_note);
-        }
-    }
-
-    var trip = [_]?TripItem{null} ** (place_count * 2);
-
-    notebook.getTripTo(trip[0..], destination) catch |err| {
-        print("Oh no! {}\n", .{err});
-        return;
-    };
-
-    printTrip(trip[0..]);
-}
-
-fn printTrip(trip: []?TripItem) void {
-    var i: u8 = @intCast(trip.len);
-
-    while (i > 0) {
-        i -= 1;
-        if (trip[i] == null) continue;
-        trip[i].?.printMe();
-    }
-
-    print("\n", .{});
-}
+// 如果你愿意，可以把它当成一个 **超级加分练习** 来实现！

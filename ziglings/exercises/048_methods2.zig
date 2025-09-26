@@ -1,6 +1,6 @@
 //
-// Now that we've seen how methods work, let's see if we can help
-// our elephants out a bit more with some Elephant methods.
+// 既然我们已经见识了方法 (methods) 是怎么用的，
+// 那么让我们再帮大象们多写几个属于 Elephant 的方法吧。
 //
 const std = @import("std");
 
@@ -9,9 +9,9 @@ const Elephant = struct {
     tail: ?*Elephant = null,
     visited: bool = false,
 
-    // New Elephant methods!
+    // 新增 Elephant 方法！
     pub fn getTail(self: *Elephant) *Elephant {
-        return self.tail.?; // Remember, this means "orelse unreachable"
+        return self.tail.?; // 记住，这里等价于 "orelse unreachable"
     }
 
     pub fn hasTail(self: *Elephant) bool {
@@ -23,7 +23,7 @@ const Elephant = struct {
     }
 
     pub fn print(self: *Elephant) void {
-        // Prints elephant letter and [v]isited
+        // 打印大象的字母以及 [v]isited
         const v: u8 = if (self.visited) 'v' else ' ';
         std.debug.print("{u}{u} ", .{ self.letter, v });
     }
@@ -34,7 +34,7 @@ pub fn main() void {
     var elephantB = Elephant{ .letter = 'B' };
     var elephantC = Elephant{ .letter = 'C' };
 
-    // This links the elephants so that each tail "points" to the next.
+    // 把大象们连起来，让每条尾巴都“指向”下一头大象。
     elephantA.tail = &elephantB;
     elephantB.tail = &elephantC;
 
@@ -43,8 +43,8 @@ pub fn main() void {
     std.debug.print("\n", .{});
 }
 
-// This function visits all elephants once, starting with the
-// first elephant and following the tails to the next elephant.
+// 这个函数会从第一头大象开始，顺着尾巴依次访问所有大象，
+// 每头大象只访问一次。
 fn visitElephants(first_elephant: *Elephant) void {
     var e = first_elephant;
 
@@ -52,27 +52,27 @@ fn visitElephants(first_elephant: *Elephant) void {
         e.print();
         e.visit();
 
-        // This gets the next elephant or stops:
-        // which method do we want here?
+        // 获取下一头大象，或者停止：
+        // 我们应该在这里调用哪个方法呢？
         e = if (e.hasTail()) e.??? else break;
     }
 }
 
-// Zig's enums can also have methods! This comment originally asked
-// if anyone could find instances of enum methods in the wild. The
-// first five pull requests were accepted and here they are:
+// Zig 的枚举 (enums) 也可以有方法！
+// 这个注释最初是让大家去找“野生的枚举方法”实例。
+// 前五个 pull requests 被接受了，这里是它们：
 //
-// 1) drforester - I found one in the Zig source:
+// 1) drforester - 我在 Zig 源码里找到了一个：
 // https://github.com/ziglang/zig/blob/041212a41cfaf029dc3eb9740467b721c76f406c/src/Compilation.zig#L2495
 //
-// 2) bbuccianti - I found one!
+// 2) bbuccianti - 我也找到了一个！
 // https://github.com/ziglang/zig/blob/6787f163eb6db2b8b89c2ea6cb51d63606487e12/lib/std/debug.zig#L477
 //
-// 3) GoldsteinE - Found many, here's one
+// 3) GoldsteinE - 找到了好几个，这里有一个：
 // https://github.com/ziglang/zig/blob/ce14bc7176f9e441064ffdde2d85e35fd78977f2/lib/std/target.zig#L65
 //
-// 4) SpencerCDixon - Love this language so far :-)
+// 4) SpencerCDixon - 太喜欢这个语言了 :-)
 // https://github.com/ziglang/zig/blob/a502c160cd51ce3de80b3be945245b7a91967a85/src/zir.zig#L530
 //
-// 5) tomkun - here's another enum method
+// 5) tomkun - 这是另一个枚举方法
 // https://github.com/ziglang/zig/blob/4ca1f4ec2e3ae1a08295bc6ed03c235cb7700ab9/src/codegen/aarch64.zig#L24

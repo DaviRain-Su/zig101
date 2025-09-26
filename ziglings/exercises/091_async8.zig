@@ -1,12 +1,10 @@
 //
-// You have doubtless noticed that 'suspend' requires a block
-// expression like so:
+// 你肯定已经注意到 `suspend` 需要一个代码块表达式，例如：
 //
 //     suspend {}
 //
-// The suspend block executes when a function suspends. To get
-// sense for when this happens, please make the following
-// program print the string
+// 这个 suspend 块会在函数挂起时执行。
+// 为了理解它什么时候发生，请让下面的程序打印出：
 //
 //     "ABCDEF"
 //

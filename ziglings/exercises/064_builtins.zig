@@ -1,83 +1,76 @@
 //
-// The Zig compiler provides "builtin" functions. You've already
-// gotten used to seeing an @import() at the top of every
-// Ziglings exercise.
+// Zig 编译器提供了“内建函数（builtin functions）”。你已经
+// 习惯在每个 Ziglings 练习的开头看到 @import() 了。
 //
-// We've also seen @intCast() in "016_for2.zig", "058_quiz7.zig";
-// and @intFromEnum() in "036_enums2.zig".
+// 我们也见过 @intCast()（在 "016_for2.zig", "058_quiz7.zig"）；
+// 以及 @intFromEnum()（在 "036_enums2.zig"）。
 //
-// Builtins are special because they are intrinsic to the Zig
-// language itself (as opposed to being provided in the standard
-// library). They are also special because they can provide
-// functionality that is only possible with help from the
-// compiler, such as type introspection (the ability to examine
-// type properties from within a program).
+// 内建函数的特殊之处在于它们是 Zig 语言本身固有的
+// （而不是由标准库提供的）。它们的另一个特别之处是，
+// 它们能提供只有在编译器帮助下才能实现的功能，
+// 比如类型自省（在程序内部检查类型属性的能力）。
 //
-// Zig contains over 100 builtin functions. We're certainly
-// not going to cover them all, but we can look at some
-// interesting ones.
+// Zig 拥有 100 多个内建函数。
+// 我们当然不会把它们全都覆盖，但可以挑一些有趣的来看看。
 //
-// Before we begin, know that many builtin functions have
-// parameters marked as "comptime". It's probably fairly clear
-// what we mean when we say that these parameters need to be
-// "known at compile time." But rest assured we'll be doing the
-// "comptime" subject real justice soon.
+// 在开始之前，要知道许多内建函数的参数会标记为 "comptime"。
+// “必须在编译时已知”这个意思大概已经很清楚了。
+// 不过放心，我们很快就会在“comptime”专题中深入讲解这一点。
 //
 const print = @import("std").debug.print;
 
 pub fn main() void {
-    // The second builtin, alphabetically, is:
+    // 按字母顺序排列，第二个内建函数是：
     //   @addWithOverflow(a: anytype, b: anytype) struct { @TypeOf(a, b), u1 }
-    //     * 'a' and 'b' are numbers of anytype.
-    //     * The return value is a tuple with the result and a possible overflow bit.
+    //     * 'a' 和 'b' 可以是任意数字类型。
+    //     * 返回值是一个元组，包含结果和一个可能的溢出位。
     //
-    // Let's try it with a tiny 4-bit integer size to make it clear:
+    // 我们用一个很小的 4 位整数来演示更清楚：
     const a: u4 = 0b1101;
     const b: u4 = 0b0101;
     const my_result = @addWithOverflow(a, b);
 
-    // Check out our fancy formatting! b:0>4 means, "print
-    // as a binary number, zero-pad right-aligned four digits."
-    // The print() below will produce: "1101 + 0101 = 0010 (true)".
+    // 看看我们华丽的格式化！b:0>4 的意思是：
+    // “以二进制打印，右对齐并用零填充到 4 位”。
+    // 下面的 print() 会输出："1101 + 0101 = 0010 (true)"。
     print("{b:0>4} + {b:0>4} = {b:0>4} ({s})", .{ a, b, my_result[0], if (my_result[1] == 1) "true" else "false" });
 
-    // Let's make sense of this answer. The value of 'b' in decimal is 5.
-    // Let's add 5 to 'a' but go one by one and see where it overflows:
+    // 来理解一下这个结果。十进制下 b 的值是 5。
+    // 我们把 5 逐个加到 a 上，看看在哪一步溢出了：
     //
-    //   a  |  b   | result | overflowed?
+    //   a  |  b   | 结果   | 是否溢出？
     // ----------------------------------
-    // 1101 + 0001 =  1110  | false
-    // 1110 + 0001 =  1111  | false
-    // 1111 + 0001 =  0000  | true  (the real answer is 10000)
-    // 0000 + 0001 =  0001  | false
-    // 0001 + 0001 =  0010  | false
+    // 1101 + 0001 =  1110  | 否
+    // 1110 + 0001 =  1111  | 否
+    // 1111 + 0001 =  0000  | 是   (真实答案是 10000)
+    // 0000 + 0001 =  0001  | 否
+    // 0001 + 0001 =  0010  | 否
     //
-    // In the last two lines the value of 'a' is corrupted because there was
-    // an overflow in line 3, but the operations of lines 4 and 5 themselves
-    // do not overflow.
-    // There is a difference between
-    //  - a value, that overflowed at some point and is now corrupted
-    //  - a single operation that overflows and maybe causes subsequent errors
-    // In practice we usually notice the overflowed value first and have to work
-    // our way backwards to the operation that caused the overflow.
+    // 在第 3 行发生溢出之后，a 的值就被破坏了，
+    // 不过第 4 和第 5 行的运算本身没有再次溢出。
+    // 这说明有区别：
+    //  - 一个值曾经溢出过，因此现在被破坏；
+    //  - 某次运算本身溢出，可能导致后续错误。
+    // 在实践中，我们通常是先发现“溢出后的值”有问题，
+    // 然后再往回追溯到引发溢出的那次运算。
     //
-    // If there was no overflow at all while adding 5 to a, what value would
-    // 'my_result' hold? Write the answer in into 'expected_result'.
+    // 如果在把 5 加到 a 的过程中完全没有溢出，
+    // 那么 'my_result' 应该是多少呢？
+    // 把答案写到 'expected_result' 里。
     const expected_result: u8 = ???;
-    print(". Without overflow: {b:0>8}. ", .{expected_result});
+    print(". 如果没有溢出：{b:0>8}. ", .{expected_result});
 
-    print("Furthermore, ", .{});
+    print("此外，", .{});
 
-    // Here's a fun one:
+    // 再来一个有趣的：
     //
     //   @bitReverse(integer: anytype) T
-    //     * 'integer' is the value to reverse.
-    //     * The return value will be the same type with the
-    //       value's bits reversed!
+    //     * 'integer' 是要翻转的值。
+    //     * 返回值与输入类型相同，只是比特位被反转了！
     //
-    // Now it's your turn. See if you can fix this attempt to use
-    // this builtin to reverse the bits of a u8 integer.
+    // 现在轮到你了。修复下面的代码，
+    // 用这个内建函数翻转一个 u8 整数的比特。
     const input: u8 = 0b11110000;
     const tupni: u8 = @bitReverse(input, tupni);
-    print("{b:0>8} backwards is {b:0>8}.\n", .{ input, tupni });
+    print("{b:0>8} 翻转后是 {b:0>8}。\n", .{ input, tupni });
 }

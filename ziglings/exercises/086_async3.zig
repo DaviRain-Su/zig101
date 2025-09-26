@@ -1,11 +1,9 @@
 //
-// Because they can suspend and resume, async Zig functions are
-// an example of a more general programming concept called
-// "coroutines". One of the neat things about Zig async functions
-// is that they retain their state as they are suspended and
-// resumed.
+// 因为可以挂起和恢复，Zig 的 async 函数是一个更通用的编程
+// 概念——“协程”（coroutines）的例子。Zig 的 async 函数有一个
+// 很酷的特点，就是在挂起和恢复时会保留它们的状态。
 //
-// See if you can make this program print "5 4 3 2 1".
+// 试试看你能否让这个程序输出 "5 4 3 2 1"。
 //
 const print = @import("std").debug.print;
 

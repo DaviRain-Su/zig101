@@ -1,14 +1,14 @@
 //
-// Now let's use pointers to do something we haven't been
-// able to do before: pass a value by reference to a function.
+// 现在我们来用指针做一件之前做不到的事：
+// 把一个值 **通过引用** 传递给函数。
 //
-// Why would we wish to pass a pointer to an integer variable
-// rather than the integer value itself? Because then we are
-// allowed to *change* the value of the variable!
+// 为什么要把一个整数变量的指针传给函数，
+// 而不是把整数值本身传进去呢？
+// 因为这样我们就能在函数里 *修改* 这个变量的值了！
 //
 //     +-----------------------------------------------+
-//     | Pass by reference when you want to change the |
-//     | pointed-to value. Otherwise, pass the value.  |
+//     | 当你希望修改被指向的值时，就用引用传递。    |
+//     | 否则，就传递值本身。                        |
 //     +-----------------------------------------------+
 //
 const std = @import("std");
@@ -17,15 +17,14 @@ pub fn main() void {
     var num: u8 = 1;
     var more_nums = [_]u8{ 1, 1, 1, 1 };
 
-    // Let's pass the num reference to our function and print it:
+    // 把 num 的引用传给函数并打印：
     makeFive(&num);
     std.debug.print("num: {}, ", .{num});
 
-    // Now something interesting. Let's pass a reference to a
-    // specific array value:
+    // 更有意思的是：我们把数组里某个具体值的引用传进去：
     makeFive(&more_nums[2]);
 
-    // And print the array:
+    // 打印整个数组：
     std.debug.print("more_nums: ", .{});
     for (more_nums) |n| {
         std.debug.print("{} ", .{n});
@@ -34,8 +33,7 @@ pub fn main() void {
     std.debug.print("\n", .{});
 }
 
-// This function should take a reference to a u8 value and set it
-// to 5.
+// 这个函数应该接收一个 u8 值的引用，并把它设为 5。
 fn makeFive(x: *u8) void {
-    ??? = 5; // fix me!
+    ??? = 5; // 修复这里！
 }

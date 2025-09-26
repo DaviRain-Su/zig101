@@ -1,25 +1,24 @@
 //
-// Remember that little mathematical virtual machine we made using the
-// "unreachable" statement?  Well, there were two problems with the
-// way we were using op codes:
+// 还记得我们之前用 `unreachable` 写的小型数学虚拟机吗？
+// 其实那里面我们使用操作码 (op code) 的方式有两个问题：
 //
-//   1. Having to remember op codes by number is no good.
-//   2. We had to use "unreachable" because Zig had no way of knowing
-//      how many valid op codes there were.
+//   1. 必须靠记忆去知道操作码对应的数字 —— 这太糟糕了。
+//   2. 我们不得不使用 `unreachable`，因为 Zig 并不知道
+//      有多少个有效的操作码。
 //
-// An "enum" is a Zig construct that lets you give names to numeric
-// values and store them in a set. They look a lot like error sets:
+// `enum`（枚举）是 Zig 提供的一种构造，
+// 它允许你给数值起名字，并把它们放在一个集合里。
+// 它们看起来和错误集合 (error set) 很像：
 //
 //     const Fruit = enum{ apple, pear, orange };
 //
 //     const my_fruit = Fruit.apple;
 //
-// Let's use an enum in place of the numbers we were using in the
-// previous version!
+// 我们来用枚举来替代之前版本里用到的数字吧！
 //
 const std = @import("std");
 
-// Please complete the enum!
+// 请补全这个枚举！
 const Ops = enum { ??? };
 
 pub fn main() void {
@@ -45,7 +44,7 @@ pub fn main() void {
             Ops.pow => {
                 current_value *= current_value;
             },
-            // No "else" needed! Why is that?
+            // 这里不需要 "else"！你知道为什么吗？
         }
 
         std.debug.print("{} ", .{current_value});

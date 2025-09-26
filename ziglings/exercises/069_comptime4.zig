@@ -1,46 +1,41 @@
 //
-// One of the more common uses of 'comptime' function parameters is
-// passing a type to a function:
+// ‘comptime’ 函数参数的一个常见用途是 **将类型传入函数**：
 //
 //     fn foo(comptime MyType: type) void { ... }
 //
-// In fact, types are ONLY available at compile time, so the
-// 'comptime' keyword is required here.
+// 事实上，类型 **只能在编译期使用**，
+// 所以这里必须加上 `comptime` 关键字。
 //
-// Please take a moment to put on the wizard hat which has been
-// provided for you. We're about to use this ability to implement
-// a generic function.
+// 现在请你戴上系统提供的「巫师帽」🧙。
+// 我们要用这种能力来实现一个 **泛型函数**。
 //
 const print = @import("std").debug.print;
 
 pub fn main() void {
-    // Here we declare arrays of three different types and sizes
-    // at compile time from a function call. Neat!
-    const s1 = makeSequence(u8, 3); // creates a [3]u8
-    const s2 = makeSequence(u32, 5); // creates a [5]u32
-    const s3 = makeSequence(i64, 7); // creates a [7]i64
+    // 在这里，我们在编译期通过函数调用声明了三种不同类型、不同大小的数组。很酷吧！
+    const s1 = makeSequence(u8, 3);   // 创建一个 [3]u8
+    const s2 = makeSequence(u32, 5);  // 创建一个 [5]u32
+    const s3 = makeSequence(i64, 7);  // 创建一个 [7]i64
 
     print("s1={any}, s2={any}, s3={any}\n", .{ s1, s2, s3 });
 }
 
-// This function is pretty wild because it executes at runtime
-// and is part of the final compiled program. The function is
-// compiled with unchanging data sizes and types.
+// 这个函数很神奇，因为它在运行时执行，
+// 并且会被编译进最终的程序。
+// 它被编译时，数据的大小和类型是固定的。
 //
-// And yet it ALSO allows for different sizes and types. This
-// seems paradoxical. How could both things be true?
+// 然而，它却还能支持不同的大小和类型。
+// 这似乎是个悖论。怎么会两者都成立呢？
 //
-// To accomplish this, the Zig compiler actually generates a
-// separate copy of the function for every size/type combination!
-// So in this case, three different functions will be generated
-// for you, each with machine code that handles that specific
-// data size and type.
+// 其实，Zig 编译器会为 **每一种大小/类型组合**
+// 单独生成一份函数拷贝！
+// 所以在这个例子里，它会帮你生成三个不同的函数，
+// 每一个都处理对应的数据大小和类型。
 //
-// Please fix this function so that the 'size' parameter:
+// 请修复下面这个函数，让 `size` 参数：
 //
-//     1) Is guaranteed to be known at compile time.
-//     2) Sets the size of the array of type T (which is the
-//        sequence we're creating and returning).
+//   1) 保证在编译期已知。
+//   2) 用来设置数组的大小，并返回指定类型 T 的数组。
 //
 fn makeSequence(comptime T: type, ??? size: usize) [???]T {
     var sequence: [???]T = undefined;

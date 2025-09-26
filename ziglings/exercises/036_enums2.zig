@@ -1,33 +1,32 @@
 //
-// Enums are really just a set of numbers. You can leave the
-// numbering up to the compiler, or you can assign them
-// explicitly. You can even specify the numeric type used.
+// 枚举 (enum) 本质上就是一组数字。
+// 你可以把编号交给编译器自动分配，
+// 也可以显式地给它们赋值。
+// 甚至还可以指定使用的数值类型。
 //
 //     const Stuff = enum(u8){ foo = 16 };
 //
-// You can get the integer out with a builtin function,
-// @intFromEnum(). We'll learn about builtins properly in a later
-// exercise.
+// 你可以用内建函数 @intFromEnum() 把枚举值转成整数。
+// 我们会在后面的练习里正式学习这些内建函数。
 //
 //     const my_stuff: u8 = @intFromEnum(Stuff.foo);
 //
-// Note how that built-in function starts with "@" just like the
-// @import() function we've been using.
+// 注意到这个内建函数和我们用过的 @import() 一样，
+// 都是以 "@" 开头的。
 //
 const std = @import("std");
 
-// Zig lets us write integers in hexadecimal format:
+// Zig 允许我们用十六进制写整数：
 //
-//     0xf (is the value 15 in hex)
+//     0xf   (在十六进制里代表十进制的 15)
 //
-// Web browsers let us specify colors using a hexadecimal
-// number where each byte represents the brightness of the
-// Red, Green, or Blue component (RGB) where two hex digits
-// are one byte with a value range of 0-255:
+// Web 浏览器允许我们用十六进制的数字来指定颜色，
+// 其中每个字节代表一个颜色分量的亮度值 (RGB)。
+// 两位十六进制数就是一个字节，范围 0-255：
 //
 //     #RRGGBB
 //
-// Please define and use a pure blue value Color:
+// 请定义并使用一个纯蓝色 (pure blue) 的 Color 值：
 const Color = enum(u32) {
     red = 0xff0000,
     green = 0x00ff00,
@@ -35,20 +34,19 @@ const Color = enum(u32) {
 };
 
 pub fn main() void {
-    // Remember Zig's multi-line strings? Here they are again.
-    // Also, check out this cool format string:
+    // 还记得 Zig 的多行字符串吗？这里又用到了。
+    // 另外，看看这个很酷的格式字符串：
     //
     //     {x:0>6}
     //      ^
-    //      x       type ('x' is lower-case hexadecimal)
-    //       :      separator (needed for format syntax)
-    //        0     padding character (default is ' ')
-    //         >    alignment ('>' aligns right)
-    //          6   width (use padding to force width)
+    //      x       类型 ('x' 表示小写十六进制)
+    //       :      分隔符（格式语法需要）
+    //        0     填充字符（默认是空格）
+    //         >    对齐方式（'>' 表示右对齐）
+    //          6   宽度（用填充来强制宽度）
     //
-    // Please add this formatting to the blue value.
-    // (Even better, experiment without it, or try parts of it
-    // to see what prints!)
+    // 请把这个格式应用到 blue 值上。
+    // （更好的是，试试去掉它，或者只改部分，看看会输出什么！）
     std.debug.print(
         \\<p>
         \\  <span style="color: #{x:0>6}">Red</span>
@@ -59,6 +57,6 @@ pub fn main() void {
     , .{
         @intFromEnum(Color.red),
         @intFromEnum(Color.green),
-        @intFromEnum(???), // Oops! We're missing something!
+        @intFromEnum(???), // 哎呀！这里还缺点东西！
     });
 }

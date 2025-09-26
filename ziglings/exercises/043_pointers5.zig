@@ -1,22 +1,22 @@
 //
-// As with integers, you can pass a pointer to a struct when you
-// will wish to modify that struct. Pointers are also useful when
-// you need to store a reference to a struct (a "link" to it).
+// 和整数一样，当你希望修改一个结构体时，
+// 你可以把它的指针传给函数。
+// 当你需要保存对结构体的引用（即一个“链接”）时，
+// 指针也很有用。
 //
 //     const Vertex = struct{ x: u32, y: u32, z: u32 };
 //
 //     var v1 = Vertex{ .x=3, .y=2, .z=5 };
 //
-//     var pv: *Vertex = &v1;   // <-- a pointer to our struct
+//     var pv: *Vertex = &v1;   // <-- 指向 v1 的指针
 //
-// Note that you don't need to dereference the "pv" pointer to access
-// the struct's fields:
+// 注意：访问结构体的字段时，你不需要先解引用指针：
 //
-//     YES: pv.x
-//     NO:  pv.*.x
+//     ✅ pv.x
+//     ❌ pv.*.x
 //
-// We can write functions that take pointers to structs as
-// arguments. This foo() function modifies struct v:
+// 我们可以写接受结构体指针作为参数的函数。
+// 比如这个 foo() 函数修改了 v：
 //
 //     fn foo(v: *Vertex) void {
 //         v.x += 2;
@@ -24,13 +24,13 @@
 //         v.z += 7;
 //     }
 //
-// And call them like so:
+// 调用时这样写：
 //
 //     foo(&v1);
 //
-// Let's revisit our RPG example and make a printCharacter() function
-// that takes a Character by reference and prints it...*and*
-// prints a linked "mentor" Character, if there is one.
+// 我们来重温 RPG 的例子，写一个 printCharacter() 函数，
+// 它接受一个角色 (Character) 的引用并打印它……
+// **同时**打印它的 “导师”(mentor)，如果存在的话。
 //
 const std = @import("std");
 
@@ -44,11 +44,11 @@ const Class = enum {
 const Character = struct {
     class: Class,
     gold: u32,
-    health: u8 = 100, // You can provide default values
+    health: u8 = 100, // 你可以提供默认值
     experience: u32,
 
-    // I need to use the '?' here to allow for a null value. But
-    // I don't explain it until later. Please don't tell anyone.
+    // 这里我需要用 '?' 来允许空值 (null)。
+    // 但我还不会解释这个，先别告诉别人哦。
     mentor: ?*Character = null,
 };
 
@@ -63,19 +63,20 @@ pub fn main() void {
         .class = Class.wizard,
         .gold = 10,
         .experience = 20,
-        .mentor = &mighty_krodor, // Glorp's mentor is the Mighty Krodor
+        .mentor = &mighty_krodor, // Glorp 的导师是 Mighty Krodor
     };
 
-    // FIX ME!
-    // Please pass Glorp to printCharacter():
+    // 修复这里！
+    // 请把 Glorp 传给 printCharacter():
     printCharacter(???);
 }
 
-// Note how this function's "c" parameter is a pointer to a Character struct.
+// 注意这个函数的参数 "c" 是一个 Character 结构体的指针。
 fn printCharacter(c: *Character) void {
-    // Here's something you haven't seen before: when switching an enum, you
-    // don't have to write the full enum name. Zig understands that ".wizard"
-    // means "Class.wizard" when we switch on a Class enum value:
+    // 你之前没见过这个：当 switch 一个枚举时，
+    // 不需要写完整的枚举名。
+    // Zig 会理解 ".wizard" 表示 "Class.wizard"，
+    // 因为我们在 switch 的是 Class 类型。
     const class_name = switch (c.class) {
         .wizard => "Wizard",
         .thief => "Thief",
@@ -90,8 +91,8 @@ fn printCharacter(c: *Character) void {
         c.experience,
     });
 
-    // Checking an "optional" value and capturing it will be
-    // explained later (this pairs with the '?' mentioned above.)
+    // 检查并捕获一个“可选值”的写法会在后面解释，
+    // 它对应上面提到的 '?'。
     if (c.mentor) |mentor| {
         std.debug.print("  Mentor: ", .{});
         printCharacter(mentor);

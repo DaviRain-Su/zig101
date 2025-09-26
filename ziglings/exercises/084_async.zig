@@ -1,53 +1,47 @@
 //
-// Six Facts:
+// 六个事实：
 //
-// 1. The memory space allocated to your program for the
-// invocation of a function and all of its data is called a
-// "stack frame".
+// 1. 为程序中函数调用及其所有数据分配的内存空间称为
+//    “栈帧”(stack frame)。
 //
-// 2. The 'return' keyword "pops" the current function
-// invocation's frame off of the stack (it is no longer needed)
-// and returns control to the place where the function was
-// called.
+// 2. 'return' 关键字会“弹出”当前函数调用的栈帧（不再需要），
+//    并将控制权返回到调用该函数的位置。
 //
 //     fn foo() void {
-//         return; // Pop the frame and return control
+//         return; // 弹出栈帧并返回控制权
 //     }
 //
-// 3. Like 'return', the 'suspend' keyword returns control to the
-// place where the function was called BUT the function
-// invocation's frame remains so that it can regain control again
-// at a later time. Functions which do this are "async"
-// functions.
+// 3. 与 'return' 不同，'suspend' 关键字会把控制权返回到
+//    调用函数的位置，但当前函数调用的栈帧会保留，
+//    以便之后再次恢复控制权。这样做的函数称为 "async"
+//    （异步）函数。
 //
 //     fn fooThatSuspends() void {
-//         suspend {} // return control, but leave the frame alone
+//         suspend {} // 返回控制权，但保留栈帧
 //     }
 //
-// 4. To call any function in async context and get a reference
-// to its frame for later use, use the 'async' keyword:
+// 4. 在异步上下文中调用函数并获取它的栈帧引用以便之后使用，
+//    使用 'async' 关键字：
 //
 //     var foo_frame = async fooThatSuspends();
 //
-// 5. If you call an async function without the 'async' keyword,
-// the function FROM WHICH you called the async function itself
-// becomes async! In this example, the bar() function is now
-// async because it calls fooThatSuspends(), which is async.
+// 5. 如果调用一个异步函数时没有加上 'async' 关键字，
+//    那么调用该异步函数的函数本身也会变成异步函数！
+//    在下面的例子中，bar() 因为调用了 fooThatSuspends()
+//    （它是异步函数），所以 bar() 也变成了异步函数。
 //
 //     fn bar() void {
 //         fooThatSuspends();
 //     }
 //
-// 6. The main() function cannot be async!
+// 6. main() 函数不能是异步的！
 //
-// Given facts 3 and 4, how do we fix this program (broken by facts
-// 5 and 6)?
+// 已知事实 3 和 4，如何修复下面因为事实 5 和 6 而出错的程序？
 //
 const print = @import("std").debug.print;
 
 pub fn main() void {
-    // Additional Hint: you can assign things to '_' when you
-    // don't intend to do anything with them.
+    // 额外提示：当你不打算使用某个值时，可以把它赋给 '_'。
     foo();
 }
 

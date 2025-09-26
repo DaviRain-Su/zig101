@@ -1,11 +1,10 @@
 //
-// It has probably not escaped your attention that we are no
-// longer capturing a return value from foo() because the 'async'
-// keyword returns the frame instead.
+// 你可能已经注意到，我们不再从 foo() 中捕获返回值，
+// 因为 'async' 关键字返回的是函数帧（frame）。
 //
-// One way to solve this is to use a global variable.
+// 解决这个问题的一种方式是使用全局变量。
 //
-// See if you can make this program print "1 2 3 4 5".
+// 试试看你能否让这个程序输出 "1 2 3 4 5"。
 //
 const print = @import("std").debug.print;
 

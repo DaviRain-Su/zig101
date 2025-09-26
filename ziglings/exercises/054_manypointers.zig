@@ -1,55 +1,53 @@
 //
-// You can also make pointers to multiple items without using a slice.
+// 你也可以在不使用切片的情况下创建指向多个元素的指针。
 //
 //     var foo: [4]u8 = [4]u8{ 1, 2, 3, 4 };
 //     var foo_slice: []u8 = foo[0..];
 //     var foo_ptr: [*]u8 = &foo;
 //     var foo_slice_from_ptr: []u8 = foo_ptr[0..4];
 //
-// The difference between foo_slice and foo_ptr is that the slice has
-// a known length. The pointer doesn't. It is up to YOU to keep track
-// of the number of u8s foo_ptr points to!
+// foo_slice 和 foo_ptr 的区别在于切片有已知的长度，而指针没有。
+// 由你自己来保证 foo_ptr 指向多少个 u8！
 //
 const std = @import("std");
 
 pub fn main() void {
-    // Take a good look at the array type to which we're coercing
-    // the zen12 string (the REAL nature of strings will be
-    // revealed when we've learned some additional features):
+    // 注意这里我们把 zen12 字符串强制转换成的数组类型
+    // （字符串的真正本质会在学习更多特性时揭晓）：
     const zen12: *const [21]u8 = "Memory is a resource.";
     //
-    //   It would also have been valid to coerce to a slice:
+    //   当然，也可以把它强制转换为切片：
     //         const zen12: []const u8 = "...";
     //
-    // Now let's turn this into a "many-item pointer":
+    // 现在我们把它转成“多元素指针”：
     const zen_manyptr: [*]const u8 = zen12;
 
-    // It's okay to access zen_manyptr just like an array or slice as
-    // long as you keep track of the length yourself!
+    // 你可以像操作数组或切片一样使用 zen_manyptr，
+    // 只要你自己记住长度是多少！
     //
-    // A "string" in Zig is a pointer to an array of const u8 values
-    // (or a slice of const u8 values, as we saw above). So, we could
-    // treat a "many-item pointer" of const u8 as a string as long as
-    // we can CONVERT IT TO A SLICE. (Hint: we do know the length!)
+    // 在 Zig 里，“字符串”其实就是指向 const u8 数组的指针
+    // （或者是 const u8 的切片，就像我们之前看到的那样）。
+    // 所以我们也可以把 const u8 的“多元素指针”当作字符串使用，
+    // 只要能把它转换为切片。（提示：我们确实知道长度！）
     //
-    // Please fix this line so the print statement below can print it:
+    // 请修复这一行，让下面的 print 能正确打印：
     const zen12_string: []const u8 = zen_manyptr;
 
-    // Here's the moment of truth!
+    // 真相时刻！
     std.debug.print("{s}\n", .{zen12_string});
 }
 //
-// Are all of these pointer types starting to get confusing?
+// 这些指针类型是不是已经开始让人头晕了？
 //
-//     FREE ZIG POINTER CHEATSHEET! (Using u8 as the example type.)
+//     免费的 ZIG 指针速查表！（这里用 u8 作为示例类型。）
 //   +---------------+----------------------------------------------+
-//   |  u8           |  one u8                                      |
-//   |  *u8          |  pointer to one u8                           |
-//   |  [2]u8        |  two u8s                                     |
-//   |  [*]u8        |  pointer to unknown number of u8s            |
-//   |  [*]const u8  |  pointer to unknown number of immutable u8s  |
-//   |  *[2]u8       |  pointer to an array of 2 u8s                |
-//   |  *const [2]u8 |  pointer to an immutable array of 2 u8s      |
-//   |  []u8         |  slice of u8s                                |
-//   |  []const u8   |  slice of immutable u8s                      |
+//   |  u8           |  单个 u8                                     |
+//   |  *u8          |  指向单个 u8 的指针                          |
+//   |  [2]u8        |  两个 u8                                     |
+//   |  [*]u8        |  指向未知数量 u8 的指针                      |
+//   |  [*]const u8  |  指向未知数量不可变 u8 的指针                |
+//   |  *[2]u8       |  指向一个由 2 个 u8 组成的数组的指针         |
+//   |  *const [2]u8 |  指向一个不可变的由 2 个 u8 组成的数组的指针 |
+//   |  []u8         |  u8 的切片                                   |
+//   |  []const u8   |  不可变 u8 的切片                            |
 //   +---------------+----------------------------------------------+
